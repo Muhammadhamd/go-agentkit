@@ -60,7 +60,7 @@ changelog:
 
 release:
   github:
-    owner: pontus-devoteam
+    owner: muhammadhamd
     name: go-agentkit
   draft: false
   prerelease: auto
@@ -71,4 +71,4 @@ release:
     Commit: {{ .Commit }}
     Date: {{ .Date }}
 
-    For more information, visit [pontus-devoteam/go-agentkit](github.com/Muhammadhamd/go-agentkit/) 
+    For more information, visit [muhammadhamd/go-agentkit](github.com/Muhammadhamd/go-agentkit/) 

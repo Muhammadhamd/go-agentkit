@@ -11,11 +11,11 @@ import (
 	"github.com/Muhammadhamd/go-agentkit/pkg/model"
 	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
 	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
-	"github.com/pontus-devoteam/go-agentkit/pkg/agent"
-	"github.com/pontus-devoteam/go-agentkit/pkg/model"
-	"github.com/pontus-devoteam/go-agentkit/pkg/model/providers/lmstudio"
-	"github.com/pontus-devoteam/go-agentkit/pkg/runner"
-	"github.com/pontus-devoteam/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"
+	"github.com/muhammadhamd/go-agentkit/pkg/runner"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 func main() {

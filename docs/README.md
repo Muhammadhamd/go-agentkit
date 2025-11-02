@@ -20,7 +20,7 @@ The Agent SDK Go project uses GitHub Actions to automatically generate API docum
 To set up your React website to receive and display the documentation:
 
 1. Create a React application for your documentation website
-2. Create a GitHub repository to host it (e.g., `pontus-devoteam/agent-sdk-website`)
+2. Create a GitHub repository to host it (e.g., `muhammadhamd/agent-sdk-website`)
 3. Configure your React app to read documentation from the `public/docs/api/{version}` directory
 4. Set up a GitHub Actions workflow in the website repo to react to the `update-documentation` event
 

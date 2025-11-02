@@ -65,7 +65,7 @@ func (c *Client) initialize(ctx context.Context) error {
 			Experimental: make(map[string]interface{}),
 		},
 		ClientInfo: MCPClientInfo{
-			Name:    "agent-sdk-go",
+			Name:    "go-agentkit",
 			Version: "1.0.0",
 		},
 	}

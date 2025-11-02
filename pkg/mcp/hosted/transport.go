@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/mcp"
+	"github.com/Muhammadhamd/go-agentkit/pkg/mcp"
 )
 
 // HTTPSSETransport implements MCP transport over HTTP/SSE

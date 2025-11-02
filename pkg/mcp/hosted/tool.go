@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/mcp"
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/tool"
+	"github.com/Muhammadhamd/go-agentkit/pkg/mcp"
+	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // HostedMCPTool represents a tool that executes on a remote MCP server

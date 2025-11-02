@@ -25,11 +25,11 @@ import (
     "log"
     "os"
 
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/agent"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp/local"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/model/providers/openai"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/runner"
+    "github.com/Muhammadhamd/go-agentkit/pkg/agent"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp/local"
+    "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"
+    "github.com/Muhammadhamd/go-agentkit/pkg/runner"
 )
 
 func main() {
@@ -116,10 +116,10 @@ import (
     "log"
     "os"
 
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/agent"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp/hosted"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/model/providers/openai"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/runner"
+    "github.com/Muhammadhamd/go-agentkit/pkg/agent"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp/hosted"
+    "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"
+    "github.com/Muhammadhamd/go-agentkit/pkg/runner"
 )
 
 func main() {
@@ -180,11 +180,11 @@ import (
     "log"
     "os"
 
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/agent"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp/local"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/model/providers/openai"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/runner"
+    "github.com/Muhammadhamd/go-agentkit/pkg/agent"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp/local"
+    "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"
+    "github.com/Muhammadhamd/go-agentkit/pkg/runner"
 )
 
 func main() {
@@ -324,11 +324,11 @@ import (
     "log"
     "os"
 
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/agent"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/mcp/local"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/model/providers/openai"
-    "github.com/Muhammadhamd/agent-sdk-go/pkg/runner"
+    "github.com/Muhammadhamd/go-agentkit/pkg/agent"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp"
+    "github.com/Muhammadhamd/go-agentkit/pkg/mcp/local"
+    "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"
+    "github.com/Muhammadhamd/go-agentkit/pkg/runner"
 )
 
 func main() {

@@ -1,0 +1,13 @@
+package main
+
+import (
+	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
+)
+
+// RunOptions represents configuration options for running agents.
+// Type alias to help with import resolution.
+type RunOptions = runner.RunOptions
+
+// RunConfig represents the configuration for the runner.
+// Type alias to help with import resolution.
+type RunConfig = runner.RunConfig

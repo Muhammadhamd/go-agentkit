@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/model"
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/result"
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/tool"
-	"github.com/Muhammadhamd/agent-sdk-go/pkg/tracing"
+	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/Muhammadhamd/go-agentkit/pkg/result"
+	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/Muhammadhamd/go-agentkit/pkg/tracing"
 )
 
 const (

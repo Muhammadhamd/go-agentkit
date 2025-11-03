@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -83,6 +84,13 @@ func (t *HTTPSSETransport) SendRequest(ctx context.Context, req *mcp.JSONRPCRequ
 	httpReq.Header.Set("Content-Type", "application/json")
 	for key, value := range t.headers {
 		httpReq.Header.Set(key, value)
+	}
+
+	if os.Getenv("DEBUG") == "1" {
+		fmt.Println("MCP POST", t.url, "method:", req.Method)
+		for key, value := range t.headers {
+			fmt.Printf("Header %s: %s\n", key, value)
+		}
 	}
 
 	resp, err := t.client.Do(httpReq)

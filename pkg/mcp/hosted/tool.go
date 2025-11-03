@@ -79,6 +79,18 @@ func NewHostedMCPTool(config HostedMCPToolConfig) (tool.Tool, error) {
 	}, nil
 }
 
+// Connect establishes the underlying MCP client connection eagerly.
+// If already initialized, it is a no-op.
+func (t *HostedMCPTool) Connect(ctx context.Context) error {
+	if t.client == nil {
+		return fmt.Errorf("client not initialized")
+	}
+	if t.client.IsInitialized() {
+		return nil
+	}
+	return t.client.Connect(ctx)
+}
+
 // GetName implements tool.Tool interface
 func (t *HostedMCPTool) GetName() string {
 	return t.name

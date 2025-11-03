@@ -21,17 +21,24 @@ func main() {
 
 	// Create hosted MCP tool
 	hostedTool, err := hosted.NewHostedMCPTool(hosted.HostedMCPToolConfig{
-		ServerLabel:  "deepwiki",
-		ServerURL:    "https://mcp.example.com/mcp",
-		AllowedTools: []string{"read", "search"},
+		ServerLabel: "local-mcp",
+		ServerURL:   "http://127.0.0.1:8000/mcp/", // Adjust to your MCP JSON-RPC endpoint
+		// Leave AllowedTools empty to avoid filtering until tool names are known
 		Headers: map[string]string{
 			"Authorization": "Bearer " + os.Getenv("MCP_API_KEY"),
 		},
 		RequireApproval: hosted.ApprovalNever,
-		Description:     "Access to DeepWiki knowledge base via MCP",
+		Description:     "Access to local MCP server",
 	})
 	if err != nil {
 		log.Fatalf("Failed to create hosted MCP tool: %v", err)
+	}
+
+	// Eagerly connect to MCP to verify connectivity and trigger POST initialize
+	if ht, ok := hostedTool.(*hosted.HostedMCPTool); ok {
+		if err := ht.Connect(ctx); err != nil {
+			log.Fatalf("Failed to connect to MCP: %v", err)
+		}
 	}
 
 	// Create an agent with hosted MCP tool

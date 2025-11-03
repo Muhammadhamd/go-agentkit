@@ -2,7 +2,7 @@ module github.com/Muhammadhamd/go-agentkit
 
 go 1.23.7
 
-replace github.com/Muhammadhamd/go-agentkit => ./
+// replace github.com/Muhammadhamd/go-agentkit => ./
 
 require (
 	github.com/stretchr/testify v1.10.0

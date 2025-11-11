@@ -256,7 +256,16 @@ func findHandoffItem(items []result.RunItem) *result.HandoffItem {
 
 // setupTracing sets up tracing for an agent if not disabled in the options
 func (r *Runner) setupTracing(ctx context.Context, agent AgentType, input interface{}, opts *RunOptions) (context.Context, func(), error) {
-	// Skip if tracing is disabled
+	// Check environment variable first (like Python/TypeScript SDKs)
+	// OPENAI_AGENTS_DISABLE_TRACING=1 or OPENAI_AGENTS_DISABLE_TRACING=true disables tracing
+	// Python SDK uses case-insensitive matching, so we match that behavior
+	disableTracingEnv := strings.ToLower(os.Getenv("OPENAI_AGENTS_DISABLE_TRACING"))
+	if disableTracingEnv == "1" || disableTracingEnv == "true" {
+		// Return no-op cleanup function
+		return ctx, func() {}, nil
+	}
+
+	// Skip if tracing is disabled in options
 	if opts.RunConfig != nil && opts.RunConfig.TracingDisabled {
 		// Return no-op cleanup function
 		return ctx, func() {}, nil

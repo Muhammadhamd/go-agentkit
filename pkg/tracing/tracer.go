@@ -167,6 +167,29 @@ func RecordEvent(ctx context.Context, event Event) {
 }
 
 // TraceForAgent creates a tracer for an agent
+// By default, uses the OpenAI backend exporter (matching Python/TypeScript SDKs)
+// If API key is not set or tracing is disabled, returns NoopTracer (NO local files)
+// This matches Python/TypeScript behavior - they don't create local files
 func TraceForAgent(agentName string) (Tracer, error) {
-	return NewFileTracer(agentName)
+	// Check if tracing is disabled
+	disableTracingEnv := strings.ToLower(os.Getenv("OPENAI_AGENTS_DISABLE_TRACING"))
+	if disableTracingEnv == "1" || disableTracingEnv == "true" {
+		return &NoopTracer{}, nil
+	}
+
+	// Check if OPENAI_API_KEY is set - if not, skip tracing entirely (no local files)
+	// This matches Python/TypeScript behavior
+	if os.Getenv("OPENAI_API_KEY") == "" {
+		return &NoopTracer{}, nil
+	}
+
+	// Try to create backend tracer (matching Python/TypeScript behavior)
+	backendTracer, err := NewBackendTracer(agentName)
+	if err == nil {
+		return backendTracer, nil
+	}
+
+	// If backend tracer creation fails, return NoopTracer (NO local files)
+	// This matches Python/TypeScript - they don't create local files as fallback
+	return &NoopTracer{}, nil
 }

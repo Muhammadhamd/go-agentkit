@@ -462,8 +462,28 @@ See the complete example in [examples/bidirectional_flow_example](./examples/bid
 <details>
 <summary>Debug your agent workflows with tracing</summary>
 
+Tracing is enabled by default. You can disable tracing in two ways:
+
+1. **Environment variable** (matches Python/TypeScript SDKs):
+   ```bash
+   export OPENAI_AGENTS_DISABLE_TRACING=1
+   # or
+   export OPENAI_AGENTS_DISABLE_TRACING=true
+   ```
+
+2. **Per-run configuration**:
+   ```go
+   // Run with tracing disabled
+   result, err := runner.RunSync(agent, &runner.RunOptions{
+       Input: "Hello, world!",
+       RunConfig: &runner.RunConfig{
+           TracingDisabled: true,
+       },
+   })
+   ```
+
 ```go
-// Run with tracing enabled
+// Run with tracing enabled and custom configuration
 result, err := runner.RunSync(agent, &runner.RunOptions{
     Input: "Hello, world!",
     RunConfig: &runner.RunConfig{
@@ -474,6 +494,8 @@ result, err := runner.RunSync(agent, &runner.RunOptions{
     },
 })
 ```
+
+By default, traces are written to local log files (`trace_<agent_name>.log`). The environment variable `OPENAI_AGENTS_DISABLE_TRACING` is checked first, matching the behavior of the Python and TypeScript SDKs.
 
 </details>
 

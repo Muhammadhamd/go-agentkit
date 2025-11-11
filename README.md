@@ -15,20 +15,20 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/muhammadhamd/go-agentkit/actions/workflows/code-quality.yml"><img src="https://github.com/muhammadhamd/go-agentkit/actions/workflows/code-quality.yml/badge.svg" alt="Code Quality"></a>
-    <a href="https://goreportcard.com/report/github.com/muhammadhamd/go-agentkit/"><img src="https://goreportcard.com/badge/github.com/muhammadhamd/go-agentkit/" alt="Go Report Card"></a>
-    <a href="https://github.com/muhammadhamd/go-agentkit/blob/main/go.mod"><img src="https://img.shields.io/github/go-mod/go-version/muhammadhamd/go-agentkit" alt="Go Version"></a>
-    <a href="https://pkg.go.dev/github.com/muhammadhamd/go-agentkit/"><img src="https://pkg.go.dev/badge/github.com/muhammadhamd/go-agentkit/.svg" alt="PkgGoDev"></a><br>
-    <a href="https://github.com/muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml"><img src="https://github.com/muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL"></a>
-    <a href="https://github.com/muhammadhamd/go-agentkit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/muhammadhamd/go-agentkit" alt="License"></a>
-    <a href="https://github.com/muhammadhamd/go-agentkit/stargazers"><img src="https://img.shields.io/github/stars/muhammadhamd/go-agentkit" alt="Stars"></a>
-    <a href="https://github.com/muhammadhamd/go-agentkit/graphs/contributors"><img src="https://img.shields.io/github/contributors/muhammadhamd/go-agentkit" alt="Contributors"></a>
-    <a href="https://github.com/muhammadhamd/go-agentkit/commits/main"><img src="https://img.shields.io/github/last-commit/muhammadhamd/go-agentkit" alt="Last Commit"></a>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/code-quality.yml"><img src="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/code-quality.yml/badge.svg" alt="Code Quality"></a>
+    <a href="https://goreportcard.com/report/github.com/Muhammadhamd/go-agentkit/"><img src="https://goreportcard.com/badge/github.com/Muhammadhamd/go-agentkit/" alt="Go Report Card"></a>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/blob/main/go.mod"><img src="https://img.shields.io/github/go-mod/go-version/Muhammadhamd/go-agentkit" alt="Go Version"></a>
+    <a href="https://pkg.go.dev/github.com/Muhammadhamd/go-agentkit/"><img src="https://pkg.go.dev/badge/github.com/Muhammadhamd/go-agentkit/.svg" alt="PkgGoDev"></a><br>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml"><img src="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL"></a>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Muhammadhamd/go-agentkit" alt="License"></a>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/stargazers"><img src="https://img.shields.io/github/stars/Muhammadhamd/go-agentkit" alt="Stars"></a>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/graphs/contributors"><img src="https://img.shields.io/github/contributors/Muhammadhamd/go-agentkit" alt="Contributors"></a>
+    <a href="https://github.com/Muhammadhamd/go-agentkit/commits/main"><img src="https://img.shields.io/github/last-commit/Muhammadhamd/go-agentkit" alt="Last Commit"></a>
 </p>
 
 <p align="center">
   <a href="https://go-agent.org/#waitlist">☁️ Cloud Waitlist</a> •
-  <a href="https://github.com/muhammadhamd/go-agentkit/blob/main/LICENSE">📜 License</a>
+  <a href="https://github.com/Muhammadhamd/go-agentkit/blob/main/LICENSE">📜 License</a>
 </p>
 
 <p align="center">
@@ -56,14 +56,13 @@
   - [Tools](#tools)
   - [Model Providers](#model-providers)
 - [Advanced Features](#-advanced-features)
-  - [Agentic Loop & Context Sharing](#agentic-loop--context-sharing)
   - [Multi-Agent Workflows](#multi-agent-workflows)
-  - [Bidirectional Agent Flow](#bidirectional-agent-flow)
   - [Tracing](#tracing)
   - [Structured Output](#structured-output)
   - [Streaming](#streaming)
   - [OpenAI Tool Definitions](#openai-tool-definitions)
   - [Workflow State Management](#workflow-state-management)
+  - [Bidirectional Agent Flow](#bidirectional-agent-flow)
 - [Examples](#-examples)
 - [Cloud Support](#-cloud-support)
 - [Development](#-development)
@@ -103,7 +102,7 @@ There are several ways to add this module to your project:
 ### Option 1: Using `go get` (Recommended)
 
 ```bash
-go get github.com/muhammadhamd/go-agentkit/
+go get github.com/Muhammadhamd/go-agentkit/
 ```
 
 ### Option 2: Add to your imports and use `go mod tidy`
@@ -111,10 +110,10 @@ go get github.com/muhammadhamd/go-agentkit/
 1. Add imports to your Go files:
    ```go
    import (
-       "github.com/muhammadhamd/go-agentkit/pkg/agent"
-       "github.com/muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"
-       "github.com/muhammadhamd/go-agentkit/pkg/runner"
-       "github.com/muhammadhamd/go-agentkit/pkg/tool"
+       "github.com/Muhammadhamd/go-agentkit/pkg/agent"
+       "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"
+       "github.com/Muhammadhamd/go-agentkit/pkg/runner"
+       "github.com/Muhammadhamd/go-agentkit/pkg/tool"
        // Import other packages as needed
    )
    ```
@@ -128,7 +127,7 @@ go get github.com/muhammadhamd/go-agentkit/
 
 Add the following line to your `go.mod` file:
 ```
-require github.com/muhammadhamd/go-agentkit/ latest
+require github.com/Muhammadhamd/go-agentkit/ latest
 ```
 
 Then run:
@@ -153,14 +152,14 @@ If you're starting a new project:
 
 3. Install the Agent SDK:
    ```bash
-   go get github.com/muhammadhamd/go-agentkit/
+   go get github.com/Muhammadhamd/go-agentkit/
    ```
 
 ### Troubleshooting
 
 - If you encounter version conflicts, you can specify a version:
   ```bash
-  go get github.com/muhammadhamd/go-agentkit/@v0.1.0  # Replace with desired version
+  go get github.com/Muhammadhamd/go-agentkit/@v0.1.0  # Replace with desired version
   ```
 
 - For private repositories or local development, consider using Go workspaces or replace directives in your go.mod file.
@@ -196,10 +195,17 @@ import (
     "log"
     "os"
 
+<<<<<<< HEAD
     "github.com/muhammadhamd/go-agentkit/pkg/agent"
     "github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
     "github.com/muhammadhamd/go-agentkit/pkg/runner"
     "github.com/muhammadhamd/go-agentkit/pkg/tool"
+=======
+    "github.com/Muhammadhamd/go-agentkit/pkg/agent"
+    "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"  // or providers/lmstudio or providers/anthropic
+    "github.com/Muhammadhamd/go-agentkit/pkg/runner"
+    "github.com/Muhammadhamd/go-agentkit/pkg/tool"
+>>>>>>> parent of 25a56ed (released new agentic loop)
 )
 
 func main() {
@@ -518,225 +524,6 @@ runner.WithDefaultProvider(openaiProvider) // or anthropicProvider or lmStudioPr
 
 ## 🔧 Advanced Features
 
-### Agentic Loop & Context Sharing
-
-<details>
-<summary>Understand how the agentic loop works and share context between agents</summary>
-
-The agentic loop is the core execution engine that powers agent interactions. It manages turn-based execution, tool calls, handoffs, and context sharing across agents.
-
-#### How the Agentic Loop Works
-
-The agentic loop follows a turn-based execution model:
-
-1. **Turn Execution**: Each turn involves:
-   - Getting input (combines original input + generated items from previous turns)
-   - Calling the model with the current conversation history
-   - Processing the model response (messages, tool calls, handoffs)
-   - Executing tools if needed
-   - Determining the next step (continue, handoff, or final output)
-
-2. **State Management**: The `RunState` tracks:
-   - Current agent and turn number
-   - Generated items (messages, tool calls, tool results)
-   - Conversation history
-   - Usage statistics
-
-3. **Next Step Types**:
-   - `NextStepRunAgain`: Continue the loop (after tool execution)
-   - `NextStepHandoff`: Transfer control to another agent
-   - `NextStepFinalOutput`: Agent has produced final output
-   - `NextStepInterruption`: Pause for approvals or user input
-
-#### Context Sharing with RunContext
-
-`RunContext` allows you to share custom data, usage statistics, and tool approval states across agent turns and handoffs:
-
-```go
-// Define your custom context type
-type MyContext struct {
-    UserID    string
-    OrderID   string
-    Metadata  map[string]interface{}
-}
-
-// Create context instance
-myContext := &MyContext{
-    UserID:   "user_123",
-    OrderID:  "order_456",
-    Metadata: make(map[string]interface{}),
-}
-
-// Pass context to the runner
-result, err := runner.Run(ctx, agent, &runner.RunOptions{
-    Input:   "Process my order",
-    Context: myContext, // Shared across all agents
-    MaxTurns: 20,
-})
-
-// Access context from result
-if result.RunContext != nil {
-    if rc, ok := result.RunContext.(*runner.RunContext); ok {
-        if myCtx, ok := rc.Context.(*MyContext); ok {
-            fmt.Printf("User ID: %s\n", myCtx.UserID)
-            fmt.Printf("Usage: %d tokens\n", rc.Usage.TotalTokens)
-        }
-    }
-}
-```
-
-#### Accessing Context in Tools
-
-Tools can access and modify the shared context:
-
-```go
-func myTool(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-    // Access RunContext from the context
-    runCtxVal := ctx.Value("run_context")
-    if runCtxVal != nil {
-        if runCtx, ok := runCtxVal.(*runner.RunContext); ok && runCtx != nil {
-            if myCtx, ok := runCtx.Context.(*MyContext); ok {
-                // Read from context
-                userID := myCtx.UserID
-                
-                // Modify context (shared across all agents)
-                myCtx.Metadata["last_tool_called"] = "myTool"
-                myCtx.Metadata["called_at"] = time.Now()
-            }
-        }
-    }
-    
-    // Tool implementation
-    return result, nil
-}
-```
-
-#### Complex Multi-Agent Flow Example
-
-Here's a complete example demonstrating context sharing across multiple agents:
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "log"
-    "time"
-    
-    "github.com/muhammadhamd/go-agentkit/pkg/agent"
-    "github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
-    "github.com/muhammadhamd/go-agentkit/pkg/runner"
-    "github.com/muhammadhamd/go-agentkit/pkg/tool"
-)
-
-// Shared context across agents
-type TestContext struct {
-    UserID    string
-    OrderID   string
-    SessionID string
-    Metadata  map[string]interface{}
-}
-
-// Tool that updates shared context
-func getUserInfo(ctx context.Context, params map[string]interface{}) (interface{}, error) {
-    userID := params["user_id"].(string)
-    
-    // Access and update shared context
-    runCtxVal := ctx.Value("run_context")
-    if runCtxVal != nil {
-        if runCtx, ok := runCtxVal.(*runner.RunContext); ok && runCtx != nil {
-            if testCtx, ok := runCtx.Context.(*TestContext); ok {
-                testCtx.UserID = userID // Shared across all agents
-            }
-        }
-    }
-    
-    return map[string]interface{}{
-        "name":  "John Doe",
-        "email": "john@example.com",
-    }, nil
-}
-
-func main() {
-    ctx := context.Background()
-    provider := openai.NewProvider("your-api-key")
-    
-    // Create shared context
-    testContext := &TestContext{
-        SessionID: fmt.Sprintf("session_%d", time.Now().Unix()),
-        Metadata:  make(map[string]interface{}),
-    }
-    
-    // Create tools
-    getUserInfoTool := tool.NewFunctionTool(
-        "get_user_info",
-        "Get user information by user_id",
-        getUserInfo,
-    )
-    
-    // Create specialized agents
-    supportAgent := agent.NewAgent("support_agent")
-    supportAgent.SetModelProvider(provider)
-    supportAgent.SetSystemInstructions(
-        "You are a support agent. Get user info first, then handoff to billing.",
-    )
-    supportAgent.WithTools(getUserInfoTool)
-    
-    billingAgent := agent.NewAgent("billing_agent")
-    billingAgent.SetModelProvider(provider)
-    billingAgent.SetSystemInstructions("You handle billing and refunds.")
-    
-    // Set up handoffs
-    supportAgent.WithHandoffs(billingAgent)
-    
-    // Create runner
-    r := runner.NewRunner().WithDefaultProvider(provider)
-    
-    // Run with shared context
-    result, err := r.Run(ctx, supportAgent, &runner.RunOptions{
-        Input:    "I need a refund for order_456, user_123",
-        Context:  testContext, // Shared across all agents
-        MaxTurns: 20,
-    })
-    
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    // Access updated context
-    if result.RunContext != nil {
-        if rc, ok := result.RunContext.(*runner.RunContext); ok {
-            if testCtx, ok := rc.Context.(*TestContext); ok {
-                fmt.Printf("User ID in context: %s\n", testCtx.UserID)
-                fmt.Printf("Usage: %d tokens\n", rc.Usage.TotalTokens)
-            }
-        }
-    }
-}
-```
-
-#### Key Features
-
-- **Turn-based Execution**: Each turn processes one model interaction
-- **State Persistence**: Conversation history and generated items are maintained
-- **Context Sharing**: Custom context is shared across all agents via `RunContext`
-- **Usage Tracking**: Token usage is automatically tracked and available in `RunContext`
-- **Tool Context Access**: Tools can read and modify shared context
-- **Handoff Context**: Context is preserved when agents hand off to each other
-
-#### Best Practices
-
-1. **Context Design**: Keep your context type simple and focused on shared data
-2. **Thread Safety**: The `RunContext` is thread-safe, but your custom context should handle concurrent access if needed
-3. **Context Size**: Keep context data small to avoid token overhead
-4. **Tool Modifications**: Tools should modify context carefully to avoid race conditions
-5. **Error Handling**: Always check for nil when accessing context values
-
-See the complete example in [store.go](./store.go) (run with `go run -tags=store store.go`).
-
-</details>
-
 ### Multi-Agent Workflows
 
 <details>
@@ -1048,8 +835,11 @@ The repository includes several examples to help you get started:
 | [Bidirectional Flow Example](./examples/bidirectional_flow_example) | Demonstrates bidirectional agent communication with task delegation and return handoffs |
 | [TypeScript Code Review Example](./examples/typescript_code_review_example) | Shows a practical application with specialized code review agents that collaborate using bidirectional handoffs |
 | [Workflow Example](./examples/workflow_example) | Demonstrates advanced workflow management with state persistence between agent executions |
+<<<<<<< HEAD
 | [Complex Agentic Flow Test](./store.go) | Comprehensive test demonstrating multi-agent workflows with context sharing, tool execution, and handoffs (run with `go run -tags=store store.go`) |
 | [DeepSeek Example](./examples/deepseek_example) | Shows how to use DeepSeek API with custom base URL (works with any OpenAI-compatible API like OpenRouter, Together AI, etc.) |
+=======
+>>>>>>> parent of 25a56ed (released new agentic loop)
 
 ### Running Examples with a Local LLM
 
@@ -1220,7 +1010,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for d
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/muhammadhamd/go-agentkit/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/Muhammadhamd/go-agentkit/blob/main/LICENSE) file for details.
 
 ## 👨‍💻 Creator
 
@@ -1250,6 +1040,7 @@ For production deployments, we're developing a fully managed cloud service. Join
 ## 👥 Community & Support
 
 - **Website**: [go-agent.org](https://go-agent.org)
+<<<<<<< HEAD
 - **GitHub**: [github.com/muhammadhamd/go-agentkit](https://github.com/muhammadhamd/go-agentkit)
 - **GitHub Issues**: [Report bugs or request features](https://github.com/muhammadhamd/go-agentkit/issues)
 - **Discussions**: [Join the conversation](https://github.com/muhammadhamd/go-agentkit/discussions)
@@ -1267,3 +1058,8 @@ For production deployments, we're developing a fully managed cloud service. Join
 <p align="center">
   Made with ❤️ by <a href="https://github.com/muhammadhamd">Muhammad Hamd</a>
 </p> 
+=======
+- **GitHub Issues**: [Report bugs or request features](https://github.com/Muhammadhamd/go-agentkit/issues)
+- **Discussions**: [Join the conversation](https://github.com/Muhammadhamd/go-agentkit/discussions)
+- **Waitlist**: [Join the cloud service waitlist](https://go-agent.org/#waitlist) 
+>>>>>>> parent of 25a56ed (released new agentic loop)

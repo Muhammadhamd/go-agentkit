@@ -5,8 +5,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // Agent represents an AI agent with specific configuration
@@ -27,6 +27,13 @@ type Agent struct {
 	// Output configuration
 	OutputType reflect.Type
 
+	// Tool use behavior configuration
+	ToolUseBehavior interface{} // Can be string ("run_llm_again", "stop_on_first_tool") or ToolUseBehavior instance
+
+	// ResetToolChoice resets tool_choice to None after agent has used tools
+	// This prevents infinite loops of tool usage (default: true, like Python)
+	ResetToolChoice bool
+
 	// Lifecycle hooks
 	Hooks Hooks
 
@@ -37,8 +44,9 @@ type Agent struct {
 // NewAgent creates a new agent with the given name and instructions
 func NewAgent(name ...string) *Agent {
 	agent := &Agent{
-		Tools:    make([]tool.Tool, 0),
-		Handoffs: make([]*Agent, 0),
+		Tools:           make([]tool.Tool, 0),
+		Handoffs:        make([]*Agent, 0),
+		ResetToolChoice: true, // Default: true, like Python
 	}
 
 	// Set name and instructions if provided
@@ -106,6 +114,15 @@ func (a *Agent) WithHooks(hooks Hooks) *Agent {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	a.Hooks = hooks
+	return a
+}
+
+// WithToolUseBehavior sets the tool use behavior for the agent
+// Can be a string ("run_llm_again", "stop_on_first_tool") or a ToolUseBehavior instance
+func (a *Agent) WithToolUseBehavior(behavior interface{}) *Agent {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.ToolUseBehavior = behavior
 	return a
 }
 

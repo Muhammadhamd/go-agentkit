@@ -3,7 +3,7 @@ package model_test
 import (
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 )
 
 // TestRequest tests creating a model request

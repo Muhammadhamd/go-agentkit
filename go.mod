@@ -1,10 +1,11 @@
-module github.com/Muhammadhamd/go-agentkit
+module github.com/muhammadhamd/go-agentkit
 
 go 1.23.7
 
-replace github.com/Muhammadhamd/go-agentkit => ./
+replace github.com/muhammadhamd/go-agentkit => ./
 
 require (
+	github.com/Muhammadhamd/go-agentkit v0.0.9
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.24.0
 )

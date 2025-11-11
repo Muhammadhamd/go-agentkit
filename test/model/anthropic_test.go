@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model/providers/anthropic"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model/providers/anthropic"
 	"github.com/stretchr/testify/assert"
 )
 

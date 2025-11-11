@@ -3,8 +3,8 @@ package runner
 import (
 	"context"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/result"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/result"
 )
 
 // SingleTurnResult contains the result of a single turn
@@ -19,6 +19,10 @@ type RunHooks interface {
 	// OnRunStart is called when the run starts
 	OnRunStart(ctx context.Context, agent *agent.Agent, input interface{}) error
 
+	// OnAgentStart is called when an agent starts (first turn or after handoff)
+	// Similar to Python's hooks.on_agent_start
+	OnAgentStart(ctx context.Context, agent AgentType, input interface{}) error
+
 	// OnTurnStart is called when a turn starts
 	OnTurnStart(ctx context.Context, agent *agent.Agent, turn int) error
 
@@ -28,7 +32,11 @@ type RunHooks interface {
 	// OnRunEnd is called when the run ends
 	OnRunEnd(ctx context.Context, result *result.RunResult) error
 
-	// OnBeforeHandoff is called before a handoff occurs
+	// OnHandoff is called when a handoff occurs (from_agent -> to_agent)
+	// Similar to Python's hooks.on_handoff
+	OnHandoff(ctx context.Context, fromAgent AgentType, toAgent AgentType) error
+
+	// OnBeforeHandoff is called before a handoff occurs (deprecated, use OnHandoff)
 	OnBeforeHandoff(ctx context.Context, agent AgentType, handoffAgent AgentType) error
 
 	// OnAfterHandoff is called after a handoff completes
@@ -40,6 +48,11 @@ type DefaultRunHooks struct{}
 
 // OnRunStart is called when the run starts
 func (h *DefaultRunHooks) OnRunStart(ctx context.Context, agent *agent.Agent, input interface{}) error {
+	return nil
+}
+
+// OnAgentStart is called when an agent starts (first turn or after handoff)
+func (h *DefaultRunHooks) OnAgentStart(ctx context.Context, agent AgentType, input interface{}) error {
 	return nil
 }
 
@@ -58,7 +71,12 @@ func (h *DefaultRunHooks) OnRunEnd(ctx context.Context, result *result.RunResult
 	return nil
 }
 
-// OnBeforeHandoff is called before a handoff occurs
+// OnHandoff is called when a handoff occurs
+func (h *DefaultRunHooks) OnHandoff(ctx context.Context, fromAgent AgentType, toAgent AgentType) error {
+	return nil
+}
+
+// OnBeforeHandoff is called before a handoff occurs (deprecated, use OnHandoff)
 func (h *DefaultRunHooks) OnBeforeHandoff(ctx context.Context, agent AgentType, handoffAgent AgentType) error {
 	return nil
 }

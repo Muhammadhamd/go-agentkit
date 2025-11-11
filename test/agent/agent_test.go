@@ -3,9 +3,9 @@ package agent_test
 import (
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // MockModelProvider is a mock implementation of model.Provider for testing

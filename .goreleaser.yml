@@ -71,4 +71,4 @@ release:
     Commit: {{ .Commit }}
     Date: {{ .Date }}
 
-    For more information, visit [muhammadhamd/go-agentkit](github.com/Muhammadhamd/go-agentkit/) 
+    For more information, visit [muhammadhamd/go-agentkit](github.com/muhammadhamd/go-agentkit/) 

@@ -1,8 +1,8 @@
 package result
 
 import (
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 )
 
 // StreamEvent represents an event in a streaming response

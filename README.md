@@ -15,30 +15,30 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/code-quality.yml"><img src="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/code-quality.yml/badge.svg" alt="Code Quality"></a>
-    <a href="https://goreportcard.com/report/github.com/Muhammadhamd/go-agentkit/"><img src="https://goreportcard.com/badge/github.com/Muhammadhamd/go-agentkit/" alt="Go Report Card"></a>
-    <a href="https://github.com/Muhammadhamd/go-agentkit/blob/main/go.mod"><img src="https://img.shields.io/github/go-mod/go-version/Muhammadhamd/go-agentkit" alt="Go Version"></a>
-    <a href="https://pkg.go.dev/github.com/Muhammadhamd/go-agentkit/"><img src="https://pkg.go.dev/badge/github.com/Muhammadhamd/go-agentkit/.svg" alt="PkgGoDev"></a><br>
-    <a href="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml"><img src="https://github.com/Muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL"></a>
-    <a href="https://github.com/Muhammadhamd/go-agentkit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Muhammadhamd/go-agentkit" alt="License"></a>
-    <a href="https://github.com/Muhammadhamd/go-agentkit/stargazers"><img src="https://img.shields.io/github/stars/Muhammadhamd/go-agentkit" alt="Stars"></a>
-    <a href="https://github.com/Muhammadhamd/go-agentkit/graphs/contributors"><img src="https://img.shields.io/github/contributors/Muhammadhamd/go-agentkit" alt="Contributors"></a>
-    <a href="https://github.com/Muhammadhamd/go-agentkit/commits/main"><img src="https://img.shields.io/github/last-commit/Muhammadhamd/go-agentkit" alt="Last Commit"></a>
+    <a href="https://github.com/muhammadhamd/go-agentkit/actions/workflows/code-quality.yml"><img src="https://github.com/muhammadhamd/go-agentkit/actions/workflows/code-quality.yml/badge.svg" alt="Code Quality"></a>
+    <a href="https://goreportcard.com/report/github.com/muhammadhamd/go-agentkit/"><img src="https://goreportcard.com/badge/github.com/muhammadhamd/go-agentkit/" alt="Go Report Card"></a>
+    <a href="https://github.com/muhammadhamd/go-agentkit/blob/main/go.mod"><img src="https://img.shields.io/github/go-mod/go-version/muhammadhamd/go-agentkit" alt="Go Version"></a>
+    <a href="https://pkg.go.dev/github.com/muhammadhamd/go-agentkit/"><img src="https://pkg.go.dev/badge/github.com/muhammadhamd/go-agentkit/.svg" alt="PkgGoDev"></a><br>
+    <a href="https://github.com/muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml"><img src="https://github.com/muhammadhamd/go-agentkit/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL"></a>
+    <a href="https://github.com/muhammadhamd/go-agentkit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/muhammadhamd/go-agentkit" alt="License"></a>
+    <a href="https://github.com/muhammadhamd/go-agentkit/stargazers"><img src="https://img.shields.io/github/stars/muhammadhamd/go-agentkit" alt="Stars"></a>
+    <a href="https://github.com/muhammadhamd/go-agentkit/graphs/contributors"><img src="https://img.shields.io/github/contributors/muhammadhamd/go-agentkit" alt="Contributors"></a>
+    <a href="https://github.com/muhammadhamd/go-agentkit/commits/main"><img src="https://img.shields.io/github/last-commit/muhammadhamd/go-agentkit" alt="Last Commit"></a>
 </p>
 
 <p align="center">
   <a href="https://go-agent.org/#waitlist">☁️ Cloud Waitlist</a> •
-  <a href="https://github.com/Muhammadhamd/go-agentkit/blob/main/LICENSE">📜 License</a>
+  <a href="https://github.com/muhammadhamd/go-agentkit/blob/main/LICENSE">📜 License</a>
+</p>
+
+<p align="center">
+  Created by <a href="https://linkedin.com/in/MuhammadHamd">Muhammad Hamd</a> • 
+  <a href="https://github.com/muhammadhamd">GitHub</a> • 
+  <a href="https://linkedin.com/in/MuhammadHamd">LinkedIn</a>
 </p>
 
 <p align="center">
   Inspired by <a href="https://platform.openai.com/docs/assistants/overview">OpenAI's Assistants API</a> and <a href="https://github.com/openai/openai-agents-python">OpenAI's Python Agent SDK</a>.
-</p>
-
-<p align="center">
-  <strong>Created by</strong> <a href="https://linkedin.com/in/MuhammadHamd">Muhammad Hamd</a> | 
-  <a href="https://github.com/muhammadhamd">GitHub</a> | 
-  <a href="https://linkedin.com/in/MuhammadHamd">LinkedIn</a>
 </p>
 
 ---
@@ -56,13 +56,14 @@
   - [Tools](#tools)
   - [Model Providers](#model-providers)
 - [Advanced Features](#-advanced-features)
+  - [Agentic Loop & Context Sharing](#agentic-loop--context-sharing)
   - [Multi-Agent Workflows](#multi-agent-workflows)
+  - [Bidirectional Agent Flow](#bidirectional-agent-flow)
   - [Tracing](#tracing)
   - [Structured Output](#structured-output)
   - [Streaming](#streaming)
   - [OpenAI Tool Definitions](#openai-tool-definitions)
   - [Workflow State Management](#workflow-state-management)
-  - [Bidirectional Agent Flow](#bidirectional-agent-flow)
 - [Examples](#-examples)
 - [Cloud Support](#-cloud-support)
 - [Development](#-development)
@@ -72,28 +73,82 @@
 
 ---
 
-## 🔍 Overview
+## 🔍 What is This?
 
-Agent SDK Go provides a comprehensive framework for building AI agents in Go. It allows you to create agents that can use tools, perform handoffs to other specialized agents, and produce structured output - all while supporting multiple LLM providers.
+**Go Agent SDK** is a powerful, easy-to-use framework for building AI agents in Go. Think of it as your toolkit for creating intelligent applications that can:
 
-**Visit [go-agent.org](https://go-agent.org) for comprehensive documentation, examples, and cloud service waitlist.**
+- **Talk to AI models** - Use OpenAI, Anthropic Claude, or local models
+- **Call functions** - Let AI agents use your Go functions as tools
+- **Work together** - Create teams of specialized agents that hand off tasks to each other
+- **Share context** - Agents can share data and remember information across conversations
+- **Stream responses** - Get real-time updates as agents work
+- **Debug easily** - Built-in tracing helps you see exactly what your agents are doing
 
-## 🌟 Features
+### Why Use Go Agent SDK?
 
-- ✅ **Multiple LLM Provider Support** - Support for OpenAI, Anthropic Claude, LM Studio, and any OpenAI-compatible API (DeepSeek, OpenRouter, Together AI, etc.)
-- ✅ **Tool Integration** - Call Go functions directly from your LLM with automatic schema generation
-- ✅ **Agent Handoffs** - Create complex multi-agent workflows with specialized agents that can delegate tasks
-- ✅ **Context Sharing** - Share custom data and state across agents and tool calls
-- ✅ **Structured Output** - Parse LLM responses into Go structs automatically
-- ✅ **Streaming** - Get real-time streaming responses for better user experience
-- ✅ **Tracing & Monitoring** - Built-in tracing to OpenAI dashboard (matches Python/TypeScript SDKs)
-- ✅ **OpenAI Compatibility** - Fully compatible with OpenAI tool definitions and API format
-- ✅ **Bidirectional Agent Flow** - Agents can hand off tasks and receive results back
-- ✅ **Workflow State Management** - Persist and manage state between agent executions
-- ✅ **Custom Model Providers** - Easy integration with any OpenAI-compatible API using custom base URLs
-- ✅ **Lifecycle Hooks** - Customize agent behavior with hooks for agent start/end, tool calls, handoffs, etc.
-- ✅ **Rate Limiting** - Built-in rate limiting support for API providers
-- ✅ **Error Handling** - Comprehensive error handling with retry logic
+- ✅ **Simple** - Easy to learn, powerful to use
+- ✅ **Production-Ready** - Built with best practices and error handling
+- ✅ **Flexible** - Works with multiple AI providers and models
+- ✅ **Compatible** - Matches OpenAI's Python and TypeScript SDKs behavior
+- ✅ **Well-Documented** - Comprehensive examples and guides
+
+**Visit [go-agent.org](https://go-agent.org) for more documentation, examples, and cloud service waitlist.**
+
+## 🌟 Complete Feature List
+
+The Go Agent SDK is a powerful, production-ready framework for building AI agents. Here are all the features available:
+
+### 🤖 Core Agent Features
+- ✅ **Multiple LLM Providers** - OpenAI (GPT-3.5, GPT-4, GPT-4o), Anthropic Claude (Haiku, Sonnet, Opus), LM Studio (local models), and custom base URLs (DeepSeek, etc.)
+- ✅ **Agent Configuration** - System instructions, model settings (temperature, max tokens), output types, and tool use behavior
+- ✅ **Agentic Loop** - Turn-based execution with automatic state management, tool calling, and handoff handling
+- ✅ **Max Turns Control** - Prevent infinite loops by limiting the number of agent turns
+- ✅ **Backward Compatibility** - All old agent creation methods still work (method chaining, direct field access)
+
+### 🛠️ Tool Features
+- ✅ **Function Tools** - Convert any Go function into a tool that agents can call
+- ✅ **OpenAI-Compatible Tools** - Use OpenAI tool definitions directly
+- ✅ **Tool Schema Generation** - Automatic JSON schema generation for tool parameters
+- ✅ **Tool Parameter Validation** - Automatic validation of tool parameters
+- ✅ **Tool Error Handling** - Custom error handling for tool failures
+- ✅ **Tool Approval** - Human-in-the-loop approval for sensitive tool calls
+- ✅ **Tool Use Behavior** - Control how agents handle tool outputs (run_llm_again, stop_on_first_tool, custom)
+
+### 👥 Multi-Agent Features
+- ✅ **Agent Handoffs** - Transfer control between specialized agents
+- ✅ **Bidirectional Flow** - Agents can delegate tasks and receive results back
+- ✅ **Task Delegation** - Track and manage delegated tasks with unique IDs
+- ✅ **Input Filtering** - Filter conversation history during handoffs
+- ✅ **Context Sharing** - Share custom data, usage stats, and tool approvals across agents
+
+### 📊 Data & Output Features
+- ✅ **Structured Output** - Parse LLM responses into Go structs with automatic validation
+- ✅ **JSON Schema Validation** - Validate structured outputs against schemas
+- ✅ **Context Sharing** - RunContext for sharing data across agents and turns
+- ✅ **Usage Tracking** - Automatic token usage tracking (input, output, total)
+
+### 🔄 Streaming & Real-time
+- ✅ **Streaming Responses** - Get real-time streaming responses from agents
+- ✅ **Stream Events** - Content, tool calls, handoffs, and completion events
+- ✅ **AsyncIterable Pattern** - Easy-to-use streaming interface
+
+### 🔍 Observability & Debugging
+- ✅ **OpenAI Backend Tracing** - Automatic tracing sent to OpenAI dashboard (matches Python/TypeScript SDKs)
+- ✅ **Environment Variable Control** - Disable tracing via `OPENAI_AGENTS_DISABLE_TRACING`
+- ✅ **Per-Run Tracing Config** - Enable/disable tracing per run
+- ✅ **No Local Files** - No trace files created locally (matches Python/TypeScript behavior)
+
+### 🔌 Integration Features
+- ✅ **MCP Support** - Model Context Protocol for local and hosted MCP servers
+- ✅ **Custom Base URLs** - Connect to any OpenAI-compatible API (DeepSeek, etc.)
+- ✅ **Lifecycle Hooks** - Agent hooks and run hooks for custom logic
+- ✅ **Workflow State Management** - State persistence, retry, recovery, and checkpointing
+
+### ⚙️ Advanced Features
+- ✅ **Error Handling** - Comprehensive error types (tool errors, model errors, max turns, guardrails)
+- ✅ **Guardrails** - Input and output validation (framework ready)
+- ✅ **Session Management** - Framework ready for conversation history persistence
+- ✅ **Consecutive Tool Call Tracking** - Prevent infinite tool call loops
 
 ## 📦 Installation
 
@@ -102,7 +157,7 @@ There are several ways to add this module to your project:
 ### Option 1: Using `go get` (Recommended)
 
 ```bash
-go get github.com/Muhammadhamd/go-agentkit/
+go get github.com/muhammadhamd/go-agentkit/
 ```
 
 ### Option 2: Add to your imports and use `go mod tidy`
@@ -110,10 +165,10 @@ go get github.com/Muhammadhamd/go-agentkit/
 1. Add imports to your Go files:
    ```go
    import (
-       "github.com/Muhammadhamd/go-agentkit/pkg/agent"
-       "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"
-       "github.com/Muhammadhamd/go-agentkit/pkg/runner"
-       "github.com/Muhammadhamd/go-agentkit/pkg/tool"
+       "github.com/muhammadhamd/go-agentkit/pkg/agent"
+       "github.com/muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"
+       "github.com/muhammadhamd/go-agentkit/pkg/runner"
+       "github.com/muhammadhamd/go-agentkit/pkg/tool"
        // Import other packages as needed
    )
    ```
@@ -127,7 +182,7 @@ go get github.com/Muhammadhamd/go-agentkit/
 
 Add the following line to your `go.mod` file:
 ```
-require github.com/Muhammadhamd/go-agentkit/ latest
+require github.com/muhammadhamd/go-agentkit/ latest
 ```
 
 Then run:
@@ -152,14 +207,14 @@ If you're starting a new project:
 
 3. Install the Agent SDK:
    ```bash
-   go get github.com/Muhammadhamd/go-agentkit/
+   go get github.com/muhammadhamd/go-agentkit/
    ```
 
 ### Troubleshooting
 
 - If you encounter version conflicts, you can specify a version:
   ```bash
-  go get github.com/Muhammadhamd/go-agentkit/@v0.1.0  # Replace with desired version
+  go get github.com/muhammadhamd/go-agentkit/@v0.1.0  # Replace with desired version
   ```
 
 - For private repositories or local development, consider using Go workspaces or replace directives in your go.mod file.
@@ -167,6 +222,8 @@ If you're starting a new project:
 > **Note:** Requires Go 1.23 or later.
 
 ## 🚀 Quick Start
+
+Let's build your first AI agent in 5 minutes! This example shows how to create an agent that can call a function.
 
 ### Step 1: Install the SDK
 
@@ -177,11 +234,11 @@ go get github.com/muhammadhamd/go-agentkit/
 ### Step 2: Set Your API Key
 
 ```bash
-# Windows PowerShell
-$env:OPENAI_API_KEY = "your-openai-api-key"
+# For OpenAI
+export OPENAI_API_KEY=your-api-key-here
 
-# Linux/macOS
-export OPENAI_API_KEY="your-openai-api-key"
+# Or for Anthropic
+export ANTHROPIC_API_KEY=your-api-key-here
 ```
 
 ### Step 3: Create Your First Agent
@@ -195,97 +252,236 @@ import (
     "log"
     "os"
 
-<<<<<<< HEAD
     "github.com/muhammadhamd/go-agentkit/pkg/agent"
     "github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
     "github.com/muhammadhamd/go-agentkit/pkg/runner"
     "github.com/muhammadhamd/go-agentkit/pkg/tool"
-=======
-    "github.com/Muhammadhamd/go-agentkit/pkg/agent"
-    "github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"  // or providers/lmstudio or providers/anthropic
-    "github.com/Muhammadhamd/go-agentkit/pkg/runner"
-    "github.com/Muhammadhamd/go-agentkit/pkg/tool"
->>>>>>> parent of 25a56ed (released new agentic loop)
 )
 
 func main() {
-    // Get API key from environment
+    // Step 1: Get your API key from environment
     apiKey := os.Getenv("OPENAI_API_KEY")
     if apiKey == "" {
-        log.Fatal("OPENAI_API_KEY environment variable not set")
+        log.Fatal("Please set OPENAI_API_KEY environment variable")
     }
 
-    // Create a provider
+    // Step 2: Create a provider (this connects to OpenAI)
     provider := openai.NewProvider(apiKey)
-    provider.SetDefaultModel("gpt-3.5-turbo")
+    provider.SetDefaultModel("gpt-4o-mini") // Use a cheaper model for testing
 
-    // Or use Anthropic Claude
-    // provider := anthropic.NewProvider(os.Getenv("ANTHROPIC_API_KEY"))
-    // provider.SetDefaultModel("claude-3-haiku-20240307")
-
-    // Or use LM Studio (local model)
-    // provider := lmstudio.NewProvider()
-    // provider.SetBaseURL("http://127.0.0.1:1234/v1")
-    // provider.SetDefaultModel("gemma-3-4b-it")
-
-    // Create a function tool
+    // Step 3: Create a tool (a function the agent can call)
     getWeather := tool.NewFunctionTool(
         "get_weather",
-        "Get the weather for a city",
+        "Get the current weather for a city",
         func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
             city := params["city"].(string)
-            return fmt.Sprintf("The weather in %s is sunny, 25°C.", city), nil
+            // In a real app, you'd call a weather API here
+            return fmt.Sprintf("The weather in %s is 72°F and sunny.", city), nil
         },
     ).WithSchema(map[string]interface{}{
         "type": "object",
         "properties": map[string]interface{}{
             "city": map[string]interface{}{
                 "type":        "string",
-                "description": "The city to get weather for",
+                "description": "The city name to get weather for",
             },
         },
         "required": []string{"city"},
     })
 
-    // Create an agent
-    assistant := agent.NewAgent("Assistant", "You are a helpful assistant.")
+    // Step 4: Create an agent
+    assistant := agent.NewAgent("Weather Assistant", "You are a helpful weather assistant.")
     assistant.SetModelProvider(provider)
-    
-    // Get the model
-    model, err := provider.GetModel("gpt-3.5-turbo")
-    if err != nil {
-        log.Fatalf("Error getting model: %v", err)
-    }
-    assistant.WithModel(model)
-    
-    // Add tools
+    assistant.WithModel("gpt-4o-mini")
     assistant.WithTools(getWeather)
 
-    // Create a runner
+    // Step 5: Create a runner and run the agent
     r := runner.NewRunner()
     r.WithDefaultProvider(provider)
 
-    // Run the agent
     result, err := r.RunSync(assistant, &runner.RunOptions{
         Input: "What's the weather in Tokyo?",
     })
     if err != nil {
-        log.Fatalf("Error running agent: %v", err)
+        log.Fatalf("Error: %v", err)
     }
 
-    // Print the result
-    fmt.Println(result.FinalOutput)
+    // Step 6: Print the result
+    fmt.Println("Agent Response:", result.FinalOutput)
 }
 ```
 
-### What Happens Next?
+### What Just Happened?
 
-1. **Agent receives input**: "What's the weather in Tokyo?"
-2. **Agent decides to use tool**: Calls `get_weather` with `city: "Tokyo"`
-3. **Tool executes**: Returns weather information
-4. **Agent responds**: Uses tool result to provide final answer
+1. **Provider** - Connects to OpenAI's API
+2. **Tool** - A function the agent can call (get_weather)
+3. **Agent** - The AI assistant with instructions and tools
+4. **Runner** - Executes the agent and handles the conversation
+5. **Result** - Contains the agent's final response
 
-That's it! Your agent is now using tools to answer questions.
+The agent automatically:
+- ✅ Understood the user's question
+- ✅ Decided to call the `get_weather` tool
+- ✅ Called the tool with `city: "Tokyo"`
+- ✅ Used the tool's result to answer the question
+
+### Try Different Providers
+
+**Anthropic Claude:**
+```go
+import "github.com/muhammadhamd/go-agentkit/pkg/model/providers/anthropic"
+
+provider := anthropic.NewProvider(os.Getenv("ANTHROPIC_API_KEY"))
+provider.SetDefaultModel("claude-3-haiku-20240307")
+```
+
+**LM Studio (Local Model):**
+```go
+import "github.com/muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"
+
+provider := lmstudio.NewProvider()
+provider.SetBaseURL("http://127.0.0.1:1234/v1")
+provider.SetDefaultModel("gemma-3-4b-it")
+```
+
+**DeepSeek (Custom Base URL):**
+```go
+deepseekProvider := openai.NewProvider(os.Getenv("DEEPSEEK_API_KEY"))
+deepseekProvider.SetBaseURL("https://api.deepseek.com/v1")
+deepseekProvider.SetDefaultModel("deepseek-chat")
+```
+
+See the [DeepSeek example](./examples/deepseek_example) for a complete example.
+
+## 💡 Common Examples
+
+### Example 1: Multi-Agent Workflow
+
+Create specialized agents that work together:
+
+```go
+// Create a support agent
+supportAgent := agent.NewAgent("Support Agent", "You handle customer support.")
+supportAgent.SetModelProvider(provider)
+supportAgent.WithTools(getUserInfoTool, checkOrderTool)
+
+// Create a billing agent
+billingAgent := agent.NewAgent("Billing Agent", "You handle billing and refunds.")
+billingAgent.SetModelProvider(provider)
+billingAgent.WithTools(calculateRefundTool, processRefundTool)
+
+// Connect them: support agent can hand off to billing agent
+supportAgent.WithHandoffs(billingAgent)
+
+// Run with shared context
+type MyContext struct {
+    UserID  string
+    OrderID string
+}
+
+ctx := &MyContext{}
+result, err := r.RunSync(supportAgent, &runner.RunOptions{
+    Input:   "I need a refund for order_123",
+    Context: ctx, // Shared across all agents
+})
+```
+
+### Example 2: Context Sharing
+
+Share data between agents and tools:
+
+```go
+// Define your context
+type AppContext struct {
+    UserID    string
+    SessionID string
+    Metadata  map[string]interface{}
+}
+
+// Create context
+appCtx := &AppContext{
+    UserID:    "user_123",
+    SessionID: "session_456",
+    Metadata:  make(map[string]interface{}),
+}
+
+// Access context in tools
+myTool := tool.NewFunctionTool(
+    "update_user",
+    "Update user information",
+    func(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+        // Get RunContext from context
+        runCtxVal := ctx.Value("run_context")
+        if runCtx, ok := runCtxVal.(*runner.RunContext); ok {
+            if appCtx, ok := runCtx.Context.(*AppContext); ok {
+                // Modify shared context
+                appCtx.Metadata["last_updated"] = time.Now()
+            }
+        }
+        return "Updated", nil
+    },
+)
+
+// Run with context
+result, err := r.RunSync(agent, &runner.RunOptions{
+    Input:   "Update my profile",
+    Context: appCtx, // Shared across agents and tools
+})
+
+// Access updated context from result
+if result.RunContext != nil {
+    // Context is automatically updated
+}
+```
+
+### Example 3: Streaming Responses
+
+Get real-time updates:
+
+```go
+streamResult, err := r.RunStreaming(ctx, agent, &runner.RunOptions{
+    Input: "Tell me a story",
+})
+
+for event := range streamResult.Stream {
+    switch event.Type {
+    case model.StreamEventTypeContent:
+        fmt.Print(event.Content) // Print as it streams
+    case model.StreamEventTypeToolCall:
+        fmt.Printf("\n🔧 Calling tool: %s\n", event.ToolCall.Name)
+    case model.StreamEventTypeDone:
+        fmt.Println("\n✅ Done!")
+    }
+}
+```
+
+### Example 4: Structured Output
+
+Get responses as Go structs:
+
+```go
+type WeatherReport struct {
+    City        string  `json:"city"`
+    Temperature float64 `json:"temperature"`
+    Condition   string  `json:"condition"`
+}
+
+agent := agent.NewAgent("Weather Agent", "You provide weather reports.")
+agent.SetOutputType(WeatherReport{}) // Specify output type
+
+result, err := r.RunSync(agent, &runner.RunOptions{
+    Input: "What's the weather in Paris?",
+})
+
+// Parse structured output
+var report WeatherReport
+if err := json.Unmarshal([]byte(result.FinalOutput.(string)), &report); err == nil {
+    fmt.Printf("City: %s, Temp: %.1f°F, Condition: %s\n", 
+        report.City, report.Temperature, report.Condition)
+}
+```
+
+See more examples in the [examples directory](./examples).
 
 ## 🖥️ Provider Setup
 
@@ -296,99 +492,13 @@ To use the OpenAI provider:
 1. **Get an API Key**
    - Sign up at [OpenAI](https://platform.openai.com/)
    - Create an API key in your account settings
-   - Copy your API key (starts with `sk-`)
 
-2. **Set Environment Variable** (Recommended - Keeps API key secure)
-
-   **Windows PowerShell:**
-   ```powershell
-   # For current session only
-   $env:OPENAI_API_KEY = "sk-your-api-key-here"
-   
-   # To save permanently (for current user)
-   [System.Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "sk-your-api-key-here", "User")
-   ```
-
-   **Windows Command Prompt:**
-   ```cmd
-   # For current session only
-   set OPENAI_API_KEY=sk-your-api-key-here
-   
-   # To save permanently
-   setx OPENAI_API_KEY "sk-your-api-key-here"
-   ```
-
-   **Linux/macOS:**
-   ```bash
-   # For current session only
-   export OPENAI_API_KEY="sk-your-api-key-here"
-   
-   # To save permanently (add to ~/.bashrc or ~/.zshrc)
-   echo 'export OPENAI_API_KEY="sk-your-api-key-here"' >> ~/.bashrc
-   source ~/.bashrc
-   ```
-
-3. **Verify it's Set**
-   ```bash
-   # Windows PowerShell
-   echo $env:OPENAI_API_KEY
-   
-   # Linux/macOS
-   echo $OPENAI_API_KEY
-   ```
-
-4. **Use in Your Code**
+2. **Configure the Provider**
    ```go
-   import (
-       "os"
-       "log"
-       "github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
-   )
-   
-   // Get API key from environment
-   apiKey := os.Getenv("OPENAI_API_KEY")
-   if apiKey == "" {
-       log.Fatal("OPENAI_API_KEY environment variable not set")
-   }
-   
-   // Create provider
-   provider := openai.NewProvider(apiKey)
-   provider.SetDefaultModel("gpt-3.5-turbo")  // or gpt-4, gpt-4o, etc.
+   provider := openai.NewProvider()
+   provider.SetAPIKey("your-openai-api-key")
+   provider.SetDefaultModel("gpt-3.5-turbo")  // or any other OpenAI model
    ```
-
-### DeepSeek & OpenAI-Compatible APIs
-
-DeepSeek and other OpenAI-compatible APIs (OpenRouter, Together AI, etc.) can be used with the OpenAI provider by setting a custom base URL:
-
-```go
-import (
-    "os"
-    "github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
-)
-
-// Get API key from environment
-apiKey := os.Getenv("DEEPSEEK_API_KEY") // or OPENAI_API_KEY
-if apiKey == "" {
-    log.Fatal("API key not set")
-}
-
-// Create provider with DeepSeek base URL
-deepseekProvider := openai.NewProvider(apiKey).
-    SetBaseURL("https://api.deepseek.com/v1").  // DeepSeek's base URL
-    WithDefaultModel("deepseek-chat")
-
-// Use it like any other provider
-agent := agent.NewAgent("DeepSeek Assistant", "You are helpful.")
-agent.SetModelProvider(deepseekProvider)
-agent.WithModel(deepseekProvider.GetModel("deepseek-chat"))
-```
-
-**Available Models:**
-- DeepSeek: `deepseek-chat`, `deepseek-coder`
-- OpenRouter: Any model supported by OpenRouter
-- Together AI: Any model supported by Together AI
-
-See the complete example in [examples/deepseek_example](./examples/deepseek_example).
 
 ### Anthropic Setup
 
@@ -524,6 +634,225 @@ runner.WithDefaultProvider(openaiProvider) // or anthropicProvider or lmStudioPr
 
 ## 🔧 Advanced Features
 
+### Agentic Loop & Context Sharing
+
+<details>
+<summary>Understand how the agentic loop works and share context between agents</summary>
+
+The agentic loop is the core execution engine that powers agent interactions. It manages turn-based execution, tool calls, handoffs, and context sharing across agents.
+
+#### How the Agentic Loop Works
+
+The agentic loop follows a turn-based execution model:
+
+1. **Turn Execution**: Each turn involves:
+   - Getting input (combines original input + generated items from previous turns)
+   - Calling the model with the current conversation history
+   - Processing the model response (messages, tool calls, handoffs)
+   - Executing tools if needed
+   - Determining the next step (continue, handoff, or final output)
+
+2. **State Management**: The `RunState` tracks:
+   - Current agent and turn number
+   - Generated items (messages, tool calls, tool results)
+   - Conversation history
+   - Usage statistics
+
+3. **Next Step Types**:
+   - `NextStepRunAgain`: Continue the loop (after tool execution)
+   - `NextStepHandoff`: Transfer control to another agent
+   - `NextStepFinalOutput`: Agent has produced final output
+   - `NextStepInterruption`: Pause for approvals or user input
+
+#### Context Sharing with RunContext
+
+`RunContext` allows you to share custom data, usage statistics, and tool approval states across agent turns and handoffs:
+
+```go
+// Define your custom context type
+type MyContext struct {
+    UserID    string
+    OrderID   string
+    Metadata  map[string]interface{}
+}
+
+// Create context instance
+myContext := &MyContext{
+    UserID:   "user_123",
+    OrderID:  "order_456",
+    Metadata: make(map[string]interface{}),
+}
+
+// Pass context to the runner
+result, err := runner.Run(ctx, agent, &runner.RunOptions{
+    Input:   "Process my order",
+    Context: myContext, // Shared across all agents
+    MaxTurns: 20,
+})
+
+// Access context from result
+if result.RunContext != nil {
+    if rc, ok := result.RunContext.(*runner.RunContext); ok {
+        if myCtx, ok := rc.Context.(*MyContext); ok {
+            fmt.Printf("User ID: %s\n", myCtx.UserID)
+            fmt.Printf("Usage: %d tokens\n", rc.Usage.TotalTokens)
+        }
+    }
+}
+```
+
+#### Accessing Context in Tools
+
+Tools can access and modify the shared context:
+
+```go
+func myTool(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+    // Access RunContext from the context
+    runCtxVal := ctx.Value("run_context")
+    if runCtxVal != nil {
+        if runCtx, ok := runCtxVal.(*runner.RunContext); ok && runCtx != nil {
+            if myCtx, ok := runCtx.Context.(*MyContext); ok {
+                // Read from context
+                userID := myCtx.UserID
+                
+                // Modify context (shared across all agents)
+                myCtx.Metadata["last_tool_called"] = "myTool"
+                myCtx.Metadata["called_at"] = time.Now()
+            }
+        }
+    }
+    
+    // Tool implementation
+    return result, nil
+}
+```
+
+#### Complex Multi-Agent Flow Example
+
+Here's a complete example demonstrating context sharing across multiple agents:
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "time"
+    
+    "github.com/muhammadhamd/go-agentkit/pkg/agent"
+    "github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
+    "github.com/muhammadhamd/go-agentkit/pkg/runner"
+    "github.com/muhammadhamd/go-agentkit/pkg/tool"
+)
+
+// Shared context across agents
+type TestContext struct {
+    UserID    string
+    OrderID   string
+    SessionID string
+    Metadata  map[string]interface{}
+}
+
+// Tool that updates shared context
+func getUserInfo(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+    userID := params["user_id"].(string)
+    
+    // Access and update shared context
+    runCtxVal := ctx.Value("run_context")
+    if runCtxVal != nil {
+        if runCtx, ok := runCtxVal.(*runner.RunContext); ok && runCtx != nil {
+            if testCtx, ok := runCtx.Context.(*TestContext); ok {
+                testCtx.UserID = userID // Shared across all agents
+            }
+        }
+    }
+    
+    return map[string]interface{}{
+        "name":  "John Doe",
+        "email": "john@example.com",
+    }, nil
+}
+
+func main() {
+    ctx := context.Background()
+    provider := openai.NewProvider("your-api-key")
+    
+    // Create shared context
+    testContext := &TestContext{
+        SessionID: fmt.Sprintf("session_%d", time.Now().Unix()),
+        Metadata:  make(map[string]interface{}),
+    }
+    
+    // Create tools
+    getUserInfoTool := tool.NewFunctionTool(
+        "get_user_info",
+        "Get user information by user_id",
+        getUserInfo,
+    )
+    
+    // Create specialized agents
+    supportAgent := agent.NewAgent("support_agent")
+    supportAgent.SetModelProvider(provider)
+    supportAgent.SetSystemInstructions(
+        "You are a support agent. Get user info first, then handoff to billing.",
+    )
+    supportAgent.WithTools(getUserInfoTool)
+    
+    billingAgent := agent.NewAgent("billing_agent")
+    billingAgent.SetModelProvider(provider)
+    billingAgent.SetSystemInstructions("You handle billing and refunds.")
+    
+    // Set up handoffs
+    supportAgent.WithHandoffs(billingAgent)
+    
+    // Create runner
+    r := runner.NewRunner().WithDefaultProvider(provider)
+    
+    // Run with shared context
+    result, err := r.Run(ctx, supportAgent, &runner.RunOptions{
+        Input:    "I need a refund for order_456, user_123",
+        Context:  testContext, // Shared across all agents
+        MaxTurns: 20,
+    })
+    
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Access updated context
+    if result.RunContext != nil {
+        if rc, ok := result.RunContext.(*runner.RunContext); ok {
+            if testCtx, ok := rc.Context.(*TestContext); ok {
+                fmt.Printf("User ID in context: %s\n", testCtx.UserID)
+                fmt.Printf("Usage: %d tokens\n", rc.Usage.TotalTokens)
+            }
+        }
+    }
+}
+```
+
+#### Key Features
+
+- **Turn-based Execution**: Each turn processes one model interaction
+- **State Persistence**: Conversation history and generated items are maintained
+- **Context Sharing**: Custom context is shared across all agents via `RunContext`
+- **Usage Tracking**: Token usage is automatically tracked and available in `RunContext`
+- **Tool Context Access**: Tools can read and modify shared context
+- **Handoff Context**: Context is preserved when agents hand off to each other
+
+#### Best Practices
+
+1. **Context Design**: Keep your context type simple and focused on shared data
+2. **Thread Safety**: The `RunContext` is thread-safe, but your custom context should handle concurrent access if needed
+3. **Context Size**: Keep context data small to avoid token overhead
+4. **Tool Modifications**: Tools should modify context carefully to avoid race conditions
+5. **Error Handling**: Always check for nil when accessing context values
+
+See the complete example in [store.go](./store.go) (run with `go run -tags=store store.go`).
+
+</details>
+
 ### Multi-Agent Workflows
 
 <details>
@@ -608,29 +937,18 @@ See the complete example in [examples/bidirectional_flow_example](./examples/bid
 <details>
 <summary>Debug your agent workflows with tracing</summary>
 
-Tracing is enabled by default and sends traces to OpenAI's dashboard (matching Python/TypeScript SDKs). **No local files are created** - traces are only sent to OpenAI's backend.
-
-#### How Tracing Works
-
-1. **Automatic Tracing**: When `OPENAI_API_KEY` is set, traces are automatically sent to OpenAI's dashboard
-2. **No Local Files**: Unlike some SDKs, we don't create local trace files - everything goes to OpenAI's backend
-3. **View Traces**: Visit [OpenAI Traces Dashboard](https://platform.openai.com/traces) to view your traces
-
-#### Disable Tracing
-
-You can disable tracing in two ways:
+Tracing is enabled by default. You can disable tracing in two ways:
 
 1. **Environment variable** (matches Python/TypeScript SDKs):
    ```bash
-   # Windows PowerShell
-   $env:OPENAI_AGENTS_DISABLE_TRACING = "1"
-   
-   # Linux/macOS
    export OPENAI_AGENTS_DISABLE_TRACING=1
+   # or
+   export OPENAI_AGENTS_DISABLE_TRACING=true
    ```
 
 2. **Per-run configuration**:
    ```go
+   // Run with tracing disabled
    result, err := runner.RunSync(agent, &runner.RunOptions{
        Input: "Hello, world!",
        RunConfig: &runner.RunConfig{
@@ -639,42 +957,20 @@ You can disable tracing in two ways:
    })
    ```
 
-#### Custom Tracing Exporters
-
-You can add custom exporters to send traces to additional backends (while keeping OpenAI):
-
 ```go
-import "github.com/muhammadhamd/go-agentkit/pkg/tracing"
-
-// Create your custom exporter
-type MyCustomExporter struct{}
-
-func (e *MyCustomExporter) Export(items []tracing.ExportableItem) error {
-    // Send to your backend
-    return nil
-}
-
-// Add it (keeps OpenAI exporter too)
-customExporter := &MyCustomExporter{}
-customProcessor := tracing.NewBatchTraceProcessor(customExporter, nil)
-customProcessor.Start()
-tracing.AddTraceProcessor(customProcessor)
-```
-
-Or replace all exporters (removes OpenAI):
-
-```go
-// Replace all processors (removes OpenAI exporter)
-tracing.SetTraceProcessors([]tracing.TracingProcessor{
-    customProcessor,
+// Run with tracing enabled and custom configuration
+result, err := runner.RunSync(agent, &runner.RunOptions{
+    Input: "Hello, world!",
+    RunConfig: &runner.RunConfig{
+        TracingDisabled: false,
+        TracingConfig: &runner.TracingConfig{
+            WorkflowName: "my_workflow",
+        },
+    },
 })
 ```
 
-#### Important Notes
-
-- **No API Key = No Tracing**: If `OPENAI_API_KEY` is not set, tracing is automatically disabled (no local files created)
-- **Matches Python/TypeScript**: Behavior matches OpenAI's Python and TypeScript SDKs exactly
-- **View in Dashboard**: All traces are viewable in [OpenAI Traces Dashboard](https://platform.openai.com/traces)
+By default, traces are written to local log files (`trace_<agent_name>.log`). The environment variable `OPENAI_AGENTS_DISABLE_TRACING` is checked first, matching the behavior of the Python and TypeScript SDKs.
 
 </details>
 
@@ -835,11 +1131,7 @@ The repository includes several examples to help you get started:
 | [Bidirectional Flow Example](./examples/bidirectional_flow_example) | Demonstrates bidirectional agent communication with task delegation and return handoffs |
 | [TypeScript Code Review Example](./examples/typescript_code_review_example) | Shows a practical application with specialized code review agents that collaborate using bidirectional handoffs |
 | [Workflow Example](./examples/workflow_example) | Demonstrates advanced workflow management with state persistence between agent executions |
-<<<<<<< HEAD
 | [Complex Agentic Flow Test](./store.go) | Comprehensive test demonstrating multi-agent workflows with context sharing, tool execution, and handoffs (run with `go run -tags=store store.go`) |
-| [DeepSeek Example](./examples/deepseek_example) | Shows how to use DeepSeek API with custom base URL (works with any OpenAI-compatible API like OpenRouter, Together AI, etc.) |
-=======
->>>>>>> parent of 25a56ed (released new agentic loop)
 
 ### Running Examples with a Local LLM
 
@@ -855,81 +1147,33 @@ The repository includes several examples to help you get started:
 
 ### Running Examples with OpenAI
 
-1. **Set your OpenAI API key** as an environment variable:
-   
-   **Windows PowerShell:**
-   ```powershell
-   $env:OPENAI_API_KEY = "your-api-key"
-   ```
-   
-   **Linux/macOS:**
+1. Set your OpenAI API key as an environment variable
    ```bash
-   export OPENAI_API_KEY="your-api-key"
+   export OPENAI_API_KEY=your-api-key
    ```
-
-2. **Navigate to the example directory:**
+2. Navigate to the example directory
    ```bash
-   cd examples/openai_example  # or openai_multi_agent_example
+   cd examples/openai_example # or openai_multi_agent_example
    ```
-
-3. **Run the example:**
+3. Run the example
    ```bash
    go run .
    ```
-
-   **Note:** Make sure to restart your terminal/IDE after setting the environment variable if you set it permanently.
 
 ### Running Examples with Anthropic
 
-1. **Set your Anthropic API key** as an environment variable:
-   
-   **Windows PowerShell:**
-   ```powershell
-   $env:ANTHROPIC_API_KEY = "your-anthropic-api-key"
-   ```
-   
-   **Linux/macOS:**
+1. Set your Anthropic API key as an environment variable
    ```bash
-   export ANTHROPIC_API_KEY="your-anthropic-api-key"
+   export ANTHROPIC_API_KEY=your-anthropic-api-key
    ```
-
-2. **Navigate to the example directory:**
+2. Navigate to the example directory
    ```bash
-   cd examples/anthropic_example  # or anthropic_handoff_example
+   cd examples/anthropic_example # or anthropic_handoff_example
    ```
-
-3. **Run the example:**
+3. Run the example
    ```bash
    go run .
    ```
-
-### Running Examples with DeepSeek (or any OpenAI-compatible API)
-
-1. **Set your API key:**
-   
-   **Windows PowerShell:**
-   ```powershell
-   $env:DEEPSEEK_API_KEY = "your-deepseek-api-key"
-   # Or use OPENAI_API_KEY if you prefer
-   $env:OPENAI_API_KEY = "your-deepseek-api-key"
-   ```
-   
-   **Linux/macOS:**
-   ```bash
-   export DEEPSEEK_API_KEY="your-deepseek-api-key"
-   ```
-
-2. **Navigate to the example:**
-   ```bash
-   cd examples/deepseek_example
-   ```
-
-3. **Run the example:**
-   ```bash
-   go run .
-   ```
-
-   **Note:** The same pattern works for OpenRouter, Together AI, or any OpenAI-compatible API - just change the base URL!
 
 ### Debugging
 
@@ -1010,20 +1254,20 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for d
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/Muhammadhamd/go-agentkit/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/muhammadhamd/go-agentkit/blob/main/LICENSE) file for details.
 
 ## 👨‍💻 Creator
 
-**Muhammad Hamd**
+**Go Agent SDK** is created and maintained by **[Muhammad Hamd](https://linkedin.com/in/MuhammadHamd)**.
 
-- 🌐 **GitHub**: [github.com/muhammadhamd](https://github.com/muhammadhamd)
-- 💼 **LinkedIn**: [linkedin.com/in/MuhammadHamd](https://linkedin.com/in/MuhammadHamd)
+- 🔗 **LinkedIn**: [linkedin.com/in/MuhammadHamd](https://linkedin.com/in/MuhammadHamd)
+- 💻 **GitHub**: [github.com/muhammadhamd](https://github.com/muhammadhamd)
 
 ## 🙏 Acknowledgements
 
-This project is inspired by [OpenAI's Assistants API](https://platform.openai.com/docs/assistants/overview) and [OpenAI's Python Agent SDK](https://github.com/openai/openai-agents-python), with the goal of providing similar capabilities in Go while being compatible with local LLMs and multiple providers.
+This project is inspired by [OpenAI's Assistants API](https://platform.openai.com/docs/assistants/overview) and [OpenAI's Python Agent SDK](https://github.com/openai/openai-agents-py), with the goal of providing similar capabilities in Go while being compatible with local LLMs and multiple providers.
 
-The implementation closely follows the patterns and practices of OpenAI's official Python and TypeScript SDKs to ensure consistency and familiarity for developers.
+Special thanks to the OpenAI team for their excellent Python and TypeScript SDKs, which served as the reference implementation for this Go version.
 
 ## ☁️ Cloud Support
 
@@ -1040,26 +1284,6 @@ For production deployments, we're developing a fully managed cloud service. Join
 ## 👥 Community & Support
 
 - **Website**: [go-agent.org](https://go-agent.org)
-<<<<<<< HEAD
-- **GitHub**: [github.com/muhammadhamd/go-agentkit](https://github.com/muhammadhamd/go-agentkit)
 - **GitHub Issues**: [Report bugs or request features](https://github.com/muhammadhamd/go-agentkit/issues)
 - **Discussions**: [Join the conversation](https://github.com/muhammadhamd/go-agentkit/discussions)
-- **Waitlist**: [Join the cloud service waitlist](https://go-agent.org/#waitlist)
-
-## 👨‍💻 Creator & Maintainer
-
-**Muhammad Hamd**
-
-- 🌐 **GitHub**: [@muhammadhamd](https://github.com/muhammadhamd)
-- 💼 **LinkedIn**: [linkedin.com/in/MuhammadHamd](https://linkedin.com/in/MuhammadHamd)
-
----
-
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/muhammadhamd">Muhammad Hamd</a>
-</p> 
-=======
-- **GitHub Issues**: [Report bugs or request features](https://github.com/Muhammadhamd/go-agentkit/issues)
-- **Discussions**: [Join the conversation](https://github.com/Muhammadhamd/go-agentkit/discussions)
 - **Waitlist**: [Join the cloud service waitlist](https://go-agent.org/#waitlist) 
->>>>>>> parent of 25a56ed (released new agentic loop)

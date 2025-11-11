@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/mcp/hosted"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"
-	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/mcp/hosted"
+	"github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
+	"github.com/muhammadhamd/go-agentkit/pkg/runner"
 )
 
 func main() {

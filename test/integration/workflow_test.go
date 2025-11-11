@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
-	"github.com/Muhammadhamd/go-agentkit/test/mocks"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/runner"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

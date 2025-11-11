@@ -6,7 +6,7 @@ This document outlines guidelines to maintain a high Go Report Card score and en
 
 [Go Report Card](https://goreportcard.com/) is a service that scans Go code and assigns a grade based on code quality metrics. Our goal is to maintain an A+ rating.
 
-Current status: [![Go Report Card](https://goreportcard.com/badge/github.com/Muhammadhamd/go-agentkit/)](https://goreportcard.com/report/github.com/Muhammadhamd/go-agentkit/)
+Current status: [![Go Report Card](https://goreportcard.com/badge/github.com/muhammadhamd/go-agentkit/)](https://goreportcard.com/report/github.com/muhammadhamd/go-agentkit/)
 
 ## Quality Checks
 

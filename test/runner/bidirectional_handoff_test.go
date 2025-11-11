@@ -3,8 +3,8 @@ package runner_test
 import (
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 

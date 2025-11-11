@@ -3,9 +3,9 @@ package runner_test
 import (
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
-	"github.com/Muhammadhamd/go-agentkit/test/mocks"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/runner"
+	"github.com/muhammadhamd/go-agentkit/test/mocks"
 )
 
 // TestNewRunner tests the creation of a new runner

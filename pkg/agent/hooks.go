@@ -3,8 +3,8 @@ package agent
 import (
 	"context"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // Hooks defines lifecycle hooks for an agent

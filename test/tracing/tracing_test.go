@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tracing"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/tracing"
 )
 
 // Helper function to create a temporary trace file
@@ -326,7 +326,7 @@ package tracing_test
 import (
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 )
 
 // Test that just passes

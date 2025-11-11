@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )

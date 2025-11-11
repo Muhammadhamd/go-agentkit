@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // TestNewFunctionTool tests the creation of a new function tool

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // GetAllMCPToolsConfig configures tool fetching from MCP servers

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
+	"github.com/muhammadhamd/go-agentkit/pkg/runner"
 )
 
 // RunOptions represents configuration options for running agents.

@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 	"github.com/stretchr/testify/mock"
 )
 

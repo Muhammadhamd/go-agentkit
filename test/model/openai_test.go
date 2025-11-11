@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model/providers/openai"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"
 	"github.com/stretchr/testify/assert"
 )
 

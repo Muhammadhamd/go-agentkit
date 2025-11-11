@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model/providers/anthropic"
-	"github.com/Muhammadhamd/go-agentkit/pkg/runner"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model/providers/anthropic"
+	"github.com/muhammadhamd/go-agentkit/pkg/runner"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 func main() {

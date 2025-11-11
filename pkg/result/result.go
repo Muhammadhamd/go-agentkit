@@ -1,8 +1,10 @@
 package result
 
 import (
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"fmt"
+
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 )
 
 // RunItem represents an item generated during a run
@@ -16,8 +18,9 @@ type RunItem interface {
 
 // MessageItem represents a message item
 type MessageItem struct {
-	Role    string
-	Content string
+	Role      string
+	Content   string
+	ToolCalls []interface{} // Optional: for assistant messages with tool calls
 }
 
 // GetType returns the type of the item
@@ -27,11 +30,16 @@ func (i *MessageItem) GetType() string {
 
 // ToInputItem converts the item to an input item
 func (i *MessageItem) ToInputItem() interface{} {
-	return map[string]interface{}{
+	item := map[string]interface{}{
 		"type":    "message",
 		"role":    i.Role,
 		"content": i.Content,
 	}
+	// Add tool_calls if present (for assistant messages)
+	if len(i.ToolCalls) > 0 {
+		item["tool_calls"] = i.ToolCalls
+	}
+	return item
 }
 
 // ToolCallItem represents a tool call item
@@ -56,8 +64,9 @@ func (i *ToolCallItem) ToInputItem() interface{} {
 
 // ToolResultItem represents a tool result item
 type ToolResultItem struct {
-	Name   string
-	Result interface{}
+	Name       string
+	Result     interface{}
+	ToolCallID string // ID of the tool call this result corresponds to
 }
 
 // GetType returns the type of the item
@@ -66,11 +75,17 @@ func (i *ToolResultItem) GetType() string {
 }
 
 // ToInputItem converts the item to an input item
+// Returns format: { type: "tool_result", tool_call: {...}, tool_result: {...} }
 func (i *ToolResultItem) ToInputItem() interface{} {
 	return map[string]interface{}{
-		"type":   "tool_result",
-		"name":   i.Name,
-		"result": i.Result,
+		"type": "tool_result",
+		"tool_call": map[string]interface{}{
+			"name": i.Name,
+			"id":   i.ToolCallID,
+		},
+		"tool_result": map[string]interface{}{
+			"content": fmt.Sprintf("%v", i.Result),
+		},
 	}
 }
 
@@ -116,6 +131,9 @@ type RunResult struct {
 
 	// LastAgent is the last agent that was run
 	LastAgent *agent.Agent
+
+	// RunContext contains the shared context and usage statistics
+	RunContext interface{}
 }
 
 // GuardrailResult represents the result of a guardrail check

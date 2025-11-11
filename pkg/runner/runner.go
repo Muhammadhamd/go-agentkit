@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
-	"github.com/Muhammadhamd/go-agentkit/pkg/result"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tracing"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/result"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/tracing"
 )
 
 const (
@@ -168,8 +168,8 @@ func (r *Runner) RunStreaming(ctx context.Context, agent AgentType, opts *RunOpt
 				}
 			}
 
-			// Prepare model settings
-			modelSettings := r.prepareModelSettings(currentAgent, opts.RunConfig, consecutiveToolCalls)
+			// Prepare model settings (streaming mode - toolUseTracker not available in old flow)
+			modelSettings := r.prepareModelSettings(currentAgent, opts.RunConfig, consecutiveToolCalls, nil)
 
 			// Prepare model request
 			request := &ModelRequestType{
@@ -302,7 +302,7 @@ func (r *Runner) setupTracing(ctx context.Context, agent AgentType, input interf
 }
 
 // prepareModelSettings creates model settings for a request based on agent and run configuration
-func (r *Runner) prepareModelSettings(agent AgentType, runConfig *RunConfig, consecutiveToolCalls int) *ModelSettingsType {
+func (r *Runner) prepareModelSettings(agent AgentType, runConfig *RunConfig, consecutiveToolCalls int, toolUseTracker *AgentToolUseTracker) *ModelSettingsType {
 	// Clone the model settings to avoid modifying the original
 	var modelSettings *ModelSettingsType
 
@@ -328,27 +328,43 @@ func (r *Runner) prepareModelSettings(agent AgentType, runConfig *RunConfig, con
 		modelSettings.ToolChoice = &autoChoice
 	}
 
+	// Reset tool_choice if agent has used tools and reset_tool_choice is enabled
+	// This prevents infinite loops of tool usage
+	if toolUseTracker != nil && agent.ResetToolChoice {
+		if toolUseTracker.HasUsedTools(agent.Name) {
+			// Reset to None/null to let model decide
+			modelSettings.ToolChoice = nil
+		}
+	}
+
 	return modelSettings
 }
 
-// runAgentLoop runs the agent loop
+// runAgentLoop runs the agent loop using OpenAI's pattern.
+// Similar to OpenAI's _run_individual_non_stream in Python and #runIndividualNonStream in TypeScript.
+// This follows the same structure as OpenAI's main agentic loop implementation.
 func (r *Runner) runAgentLoop(ctx context.Context, agent AgentType, input interface{}, opts *RunOptions) (*result.RunResult, error) {
+	// Initialize RunContext
+	runContext := NewRunContext(opts.Context)
+
+	// Initialize RunState (similar to OpenAI's RunState)
+	state := NewRunState(agent, input, opts.MaxTurns, runContext)
+
 	// Initialize result
 	runResult := &result.RunResult{
 		Input:        input,
 		NewItems:     make([]result.RunItem, 0),
 		LastAgent:    agent,
 		FinalOutput:  nil,
-		RawResponses: make([]model.Response, 0), // Initialize the raw responses slice
+		RawResponses: make([]model.Response, 0),
 	}
 
 	// Set up tracing if not disabled
 	var tracingCleanup func()
 	ctx, tracingCleanup, _ = r.setupTracing(ctx, agent, input, opts)
 	defer func() {
-		// Update final output in tracing before cleanup
 		if tracingCleanup != nil {
-			tracing.AgentEnd(ctx, agent.Name, runResult.FinalOutput)
+			tracing.AgentEnd(ctx, state.CurrentAgent.Name, runResult.FinalOutput)
 			tracingCleanup()
 		}
 	}()
@@ -358,90 +374,71 @@ func (r *Runner) runAgentLoop(ctx context.Context, agent AgentType, input interf
 		return nil, err
 	}
 
-	// Variables to track consecutive tool calls
-	consecutiveToolCalls := 0
+	// Main loop - follows OpenAI's pattern
+	for {
+		// Check current step type
+		switch step := state.CurrentStep.(type) {
+		case *NextStepInterruption:
+			// Handle interruption (e.g., tool approvals)
+			// For now, we'll wait for approvals to be handled externally
+			// The interruptions are stored in step.Interruptions
+			// In a real implementation, this would pause execution and wait for user approval
+			// For now, we'll treat it as an error that needs to be handled
+			return nil, fmt.Errorf("interruption required: %d items need approval", len(step.Interruptions))
 
-	// Run the agent loop
-	currentAgent := agent
-	currentInput := input
-	for turn := 1; turn <= opts.MaxTurns; turn++ {
-		// Call turn start hooks
-		if err := r.callTurnStartHooks(ctx, currentAgent, turn, opts); err != nil {
-			return nil, err
-		}
-
-		// Prepare and execute model request
-		response, err := r.executeModelRequest(ctx, currentAgent, currentInput, consecutiveToolCalls, opts, turn)
-		if err != nil {
-			return nil, err
-		}
-
-		// Store the raw response in the result
-		runResult.RawResponses = append(runResult.RawResponses, *response)
-
-		// Process the response
-		// Check if we have a final output (structured output)
-		if currentAgent.OutputType != nil {
-			// TODO: Implement structured output parsing
-			runResult.FinalOutput = response.Content
-
-			// Call hooks if provided
-			if err := r.callTurnEndHooks(ctx, currentAgent, turn, response, runResult.FinalOutput, opts); err != nil {
+		case *NextStepRunAgain:
+			// Process a single turn
+			if err := r.callTurnStartHooks(ctx, state.CurrentAgent, state.CurrentTurn+1, opts); err != nil {
 				return nil, err
 			}
 
-			break
-		}
-
-		// Check if we have a handoff
-		if response.HandoffCall != nil {
-			nextAgent, nextInput, err := r.processHandoff(ctx, currentAgent, currentInput, response.HandoffCall, runResult, opts)
+			turnResult, err := r.processSingleTurn(ctx, state, opts)
 			if err != nil {
 				return nil, err
 			}
 
-			if nextAgent != nil {
-				// Reset consecutive tool calls counter on handoff
-				consecutiveToolCalls = 0
-				currentAgent = nextAgent
-				currentInput = nextInput
-				continue
-			}
-		}
+			// Update state with turn result
+			state.OriginalInput = turnResult.OriginalInput
+			state.AddGeneratedItems(turnResult.GeneratedItems)
+			state.CurrentStep = turnResult.NextStep
 
-		// Check if we have tool calls
-		if len(response.ToolCalls) > 0 {
-			// Process tool calls and update input
-			nextInput, continueLoop, toolCallCount := r.processToolCalls(ctx, currentAgent, response, currentInput, consecutiveToolCalls, runResult, turn, opts)
-			if continueLoop {
-				currentInput = nextInput
-				consecutiveToolCalls = toolCallCount
-				continue
+			// Call turn end hooks
+			if turnResult.ModelResponse != nil {
+				if err := r.callTurnEndHooks(ctx, state.CurrentAgent, state.CurrentTurn, turnResult.ModelResponse, nil, opts); err != nil {
+					return nil, err
+				}
 			}
-		} else if response.Content != "" {
-			// If we get here with content, we have a final output
-			runResult.FinalOutput = response.Content
 
-			// Call hooks if provided
-			if err := r.callTurnEndHooks(ctx, currentAgent, turn, response, runResult.FinalOutput, opts); err != nil {
+		case *NextStepFinalOutput:
+			// Agent has produced final output
+			runResult.FinalOutput = step.Output
+			runResult.NewItems = state.GeneratedItems
+			runResult.RawResponses = state.RawResponses
+			runResult.LastAgent = state.CurrentAgent
+			runResult.RunContext = state.RunContext
+
+			// Call end hooks
+			if err := r.callEndHooks(ctx, agent, runResult, opts); err != nil {
 				return nil, err
 			}
 
-			break
-		}
+			return runResult, nil
 
-		// If we reached max turns without a final output, use the last response content
-		if turn == opts.MaxTurns && runResult.FinalOutput == nil {
-			runResult.FinalOutput = response.Content
+		case *NextStepHandoff:
+			// Switch to new agent
+			state.CurrentAgent = step.NewAgent
+			state.OriginalInput = step.Input      // Update original input for new agent
+			state.ConsecutiveToolCalls = 0        // Reset on handoff
+			state.ShouldRunAgentStartHooks = true // Run agent start hooks for new agent (like Python)
+			state.CurrentStep = &NextStepRunAgain{}
+
+			// Continue loop with new agent
+			continue
+
+		default:
+			return nil, fmt.Errorf("unknown next step type: %T", step)
 		}
 	}
-
-	// Call end hooks
-	if err := r.callEndHooks(ctx, agent, runResult, opts); err != nil {
-		return nil, err
-	}
-
-	return runResult, nil
 }
 
 // callStartHooks calls the hooks at the start of a run
@@ -512,9 +509,9 @@ func (r *Runner) callEndHooks(ctx context.Context, agent AgentType, runResult *r
 }
 
 // executeModelRequest prepares and executes a model request
-func (r *Runner) executeModelRequest(ctx context.Context, agent AgentType, input interface{}, consecutiveToolCalls int, opts *RunOptions, turn int) (*model.Response, error) {
-	// Prepare model settings
-	modelSettings := r.prepareModelSettings(agent, opts.RunConfig, consecutiveToolCalls)
+func (r *Runner) executeModelRequest(ctx context.Context, agent AgentType, input interface{}, consecutiveToolCalls int, opts *RunOptions, turn int, toolUseTracker *AgentToolUseTracker) (*model.Response, error) {
+	// Prepare model settings (with tool use tracker for reset_tool_choice)
+	modelSettings := r.prepareModelSettings(agent, opts.RunConfig, consecutiveToolCalls, toolUseTracker)
 
 	// Prepare model request
 	request := &ModelRequestType{
@@ -563,14 +560,27 @@ func (r *Runner) executeModelRequest(ctx context.Context, agent AgentType, input
 
 // processHandoff handles a handoff to another agent
 func (r *Runner) processHandoff(ctx context.Context, currentAgent AgentType, currentInput interface{}, handoffCall *model.HandoffCall, runResult *result.RunResult, opts *RunOptions) (AgentType, interface{}, error) {
-	// Get the input from Parameters
-	var handoffInput interface{}
+	// Get the handoff input string from LLM tool call
+	var handoffInputStr string
 	if inputVal, ok := handoffCall.Parameters["input"]; ok {
-		handoffInput = inputVal
+		if str, ok := inputVal.(string); ok {
+			handoffInputStr = str
+		} else {
+			handoffInputStr = fmt.Sprintf("%v", inputVal)
+		}
 	} else {
-		// Default to empty string if no input provided
-		handoffInput = ""
+		handoffInputStr = ""
 	}
+
+	// Get full conversation history (originalInput + all generatedItems)
+	fullConversation := runResult.ToInputList()
+
+	// Append handoff input as a new user message to the conversation array
+	handoffInput := append(fullConversation, map[string]interface{}{
+		"type":    "message",
+		"role":    "user",
+		"content": handoffInputStr,
+	})
 
 	// Generate a task ID if one doesn't exist
 	taskID := handoffCall.TaskID
@@ -628,7 +638,7 @@ func (r *Runner) processHandoff(ctx context.Context, currentAgent AgentType, cur
 		if currentTask != nil {
 			// Mark the task as complete before returning
 			if handoffCall.IsTaskComplete {
-				r.completeTask(currentTask.TaskID, handoffInput)
+				r.completeTask(currentTask.TaskID, handoffInputStr)
 			}
 
 			// Find parent task in related tasks
@@ -637,51 +647,40 @@ func (r *Runner) processHandoff(ctx context.Context, currentAgent AgentType, cur
 				parentTaskID = parentTask.TaskID
 
 				// Record the current result in the parent task
-				r.addTaskMetadata(parentTaskID, "child_result_"+currentTask.TaskID, handoffInput)
+				r.addTaskMetadata(parentTaskID, "child_result_"+currentTask.TaskID, handoffInputStr)
 
-				// If the input is a map or can be converted to a string, try to extract artifacts
-				if inputMap, ok := handoffInput.(map[string]interface{}); ok {
-					if code, hasCode := inputMap["code"]; hasCode {
-						r.updateTaskContext(parentTaskID, code, "code")
-					} else if text, hasText := inputMap["text"]; hasText {
-						r.updateTaskContext(parentTaskID, text, "text")
-					}
-				} else if inputStr, ok := handoffInput.(string); ok {
-					// Check if it looks like code (simplistic check)
-					if strings.Contains(inputStr, "function ") || strings.Contains(inputStr, "class ") {
-						r.updateTaskContext(parentTaskID, inputStr, "code")
-					} else {
-						r.updateTaskContext(parentTaskID, inputStr, "text")
-					}
+				// Check if it looks like code (simplistic check)
+				if strings.Contains(handoffInputStr, "function ") || strings.Contains(handoffInputStr, "class ") {
+					r.updateTaskContext(parentTaskID, handoffInputStr, "code")
+				} else {
+					r.updateTaskContext(parentTaskID, handoffInputStr, "text")
 				}
 
 				// Update the interaction history
-				r.addTaskInteraction(parentTaskID, currentAgent.Name, handoffInput)
+				r.addTaskInteraction(parentTaskID, currentAgent.Name, handoffInputStr)
 			}
 		}
 
 		// Enhance handoff input with task context if available
 		enhancedInput := handoffInput
 		if currentTask != nil && currentTask.WorkingContext != nil && currentTask.WorkingContext.Artifact != nil {
-			// If the input is a string, we can append context information
-			if inputStr, ok := handoffInput.(string); ok {
-				contextInfo := fmt.Sprintf("\n\nTask Context:\n- Task ID: %s\n", currentTask.TaskID)
+			// Append context information as a new message in the conversation array
+			contextInfo := fmt.Sprintf("Task Context:\n- Task ID: %s\n", currentTask.TaskID)
 
-				if currentTask.TaskDescription != "" {
-					contextInfo += fmt.Sprintf("- Description: %s\n", currentTask.TaskDescription)
-				}
-
-				if currentTask.WorkingContext.ArtifactType != "" {
-					contextInfo += fmt.Sprintf("- Artifact Type: %s\n", currentTask.WorkingContext.ArtifactType)
-				}
-
-				enhancedInput = inputStr + contextInfo
-			} else if inputMap, ok := handoffInput.(map[string]interface{}); ok {
-				// If the input is a map, we can add context as additional fields
-				inputMap["task_id"] = currentTask.TaskID
-				inputMap["task_context"] = currentTask.WorkingContext
-				enhancedInput = inputMap
+			if currentTask.TaskDescription != "" {
+				contextInfo += fmt.Sprintf("- Description: %s\n", currentTask.TaskDescription)
 			}
+
+			if currentTask.WorkingContext.ArtifactType != "" {
+				contextInfo += fmt.Sprintf("- Artifact Type: %s\n", currentTask.WorkingContext.ArtifactType)
+			}
+
+			// Append context as a new system message
+			enhancedInput = append(enhancedInput, map[string]interface{}{
+				"type":    "message",
+				"role":    "system",
+				"content": contextInfo,
+			})
 		}
 
 		// Record handoff event
@@ -743,17 +742,15 @@ func (r *Runner) processHandoff(ctx context.Context, currentAgent AgentType, cur
 			newTaskID = r.createTask(currentAgent.Name, handoffAgent.Name)
 		}
 
-		// Set task description if input is a string
-		if inputStr, ok := handoffInput.(string); ok {
-			if len(inputStr) > 100 {
-				r.getTask(newTaskID).SetDescription(inputStr[:100] + "...")
-			} else {
-				r.getTask(newTaskID).SetDescription(inputStr)
-			}
+		// Set task description using the handoff input string
+		if len(handoffInputStr) > 100 {
+			r.getTask(newTaskID).SetDescription(handoffInputStr[:100] + "...")
+		} else {
+			r.getTask(newTaskID).SetDescription(handoffInputStr)
 		}
 
 		// Add initial interaction
-		r.addTaskInteraction(newTaskID, currentAgent.Name, handoffInput)
+		r.addTaskInteraction(newTaskID, currentAgent.Name, handoffInputStr)
 
 		// Enhance input with context from current work if available
 		enhancedInput := handoffInput
@@ -762,25 +759,23 @@ func (r *Runner) processHandoff(ctx context.Context, currentAgent AgentType, cur
 			artifact := currentTask.WorkingContext.Artifact
 			artifactType := currentTask.WorkingContext.ArtifactType
 
-			// Create an enhanced input that includes the artifact
-			if inputStr, ok := handoffInput.(string); ok {
-				// For string inputs, we can include artifact info in the input
-				artifactInfo := ""
-				if artifactType == "code" {
-					if codeStr, ok := artifact.(string); ok {
-						artifactInfo = fmt.Sprintf("\n\nHere is the code that was previously worked on:\n```\n%s\n```\n", codeStr)
-					}
+			// Append artifact info as a new message in the conversation array
+			var artifactInfo string
+			if artifactType == "code" {
+				if codeStr, ok := artifact.(string); ok {
+					artifactInfo = fmt.Sprintf("Here is the code that was previously worked on:\n```\n%s\n```\n", codeStr)
 				}
+			} else {
+				artifactInfo = fmt.Sprintf("Context artifact: %v", artifact)
+			}
 
-				enhancedInput = inputStr + artifactInfo
-			} else if inputMap, ok := handoffInput.(map[string]interface{}); ok {
-				// For map inputs, we can add the artifact as a field
-				if artifactType == "code" {
-					inputMap["code_context"] = artifact
-				} else {
-					inputMap["context"] = artifact
-				}
-				enhancedInput = inputMap
+			// Append artifact as a new system message
+			if artifactInfo != "" {
+				enhancedInput = append(enhancedInput, map[string]interface{}{
+					"type":    "message",
+					"role":    "system",
+					"content": artifactInfo,
+				})
 			}
 
 			// Also set the artifact in the new task
@@ -1954,14 +1949,27 @@ func (r *Runner) handleHandoff(
 	turn int,
 	eventCh chan model.StreamEvent,
 ) (AgentType, interface{}, error) {
-	// Get the input from Parameters
-	var handoffInput interface{}
+	// Get the handoff input string from LLM tool call
+	var handoffInputStr string
 	if inputVal, ok := handoffCall.Parameters["input"]; ok {
-		handoffInput = inputVal
+		if str, ok := inputVal.(string); ok {
+			handoffInputStr = str
+		} else {
+			handoffInputStr = fmt.Sprintf("%v", inputVal)
+		}
 	} else {
-		// Default to empty string if no input provided
-		handoffInput = ""
+		handoffInputStr = ""
 	}
+
+	// Get full conversation history (originalInput + all generatedItems)
+	fullConversation := streamedResult.RunResult.ToInputList()
+
+	// Append handoff input as a new user message to the conversation array
+	handoffInput := append(fullConversation, map[string]interface{}{
+		"type":    "message",
+		"role":    "user",
+		"content": handoffInputStr,
+	})
 
 	// Generate a task ID if one doesn't exist
 	taskID := handoffCall.TaskID
@@ -2019,7 +2027,7 @@ func (r *Runner) handleHandoff(
 		if currentTask != nil {
 			// Mark the task as complete before returning
 			if handoffCall.IsTaskComplete {
-				r.completeTask(currentTask.TaskID, handoffInput)
+				r.completeTask(currentTask.TaskID, handoffInputStr)
 			}
 
 			// Find parent task in related tasks
@@ -2028,51 +2036,40 @@ func (r *Runner) handleHandoff(
 				parentTaskID = parentTask.TaskID
 
 				// Record the current result in the parent task
-				r.addTaskMetadata(parentTaskID, "child_result_"+currentTask.TaskID, handoffInput)
+				r.addTaskMetadata(parentTaskID, "child_result_"+currentTask.TaskID, handoffInputStr)
 
-				// If the input is a map or can be converted to a string, try to extract artifacts
-				if inputMap, ok := handoffInput.(map[string]interface{}); ok {
-					if code, hasCode := inputMap["code"]; hasCode {
-						r.updateTaskContext(parentTaskID, code, "code")
-					} else if text, hasText := inputMap["text"]; hasText {
-						r.updateTaskContext(parentTaskID, text, "text")
-					}
-				} else if inputStr, ok := handoffInput.(string); ok {
-					// Check if it looks like code (simplistic check)
-					if strings.Contains(inputStr, "function ") || strings.Contains(inputStr, "class ") {
-						r.updateTaskContext(parentTaskID, inputStr, "code")
-					} else {
-						r.updateTaskContext(parentTaskID, inputStr, "text")
-					}
+				// Check if it looks like code (simplistic check)
+				if strings.Contains(handoffInputStr, "function ") || strings.Contains(handoffInputStr, "class ") {
+					r.updateTaskContext(parentTaskID, handoffInputStr, "code")
+				} else {
+					r.updateTaskContext(parentTaskID, handoffInputStr, "text")
 				}
 
 				// Update the interaction history
-				r.addTaskInteraction(parentTaskID, currentAgent.Name, handoffInput)
+				r.addTaskInteraction(parentTaskID, currentAgent.Name, handoffInputStr)
 			}
 		}
 
 		// Enhance handoff input with task context if available
 		enhancedInput := handoffInput
 		if currentTask != nil && currentTask.WorkingContext != nil && currentTask.WorkingContext.Artifact != nil {
-			// If the input is a string, we can append context information
-			if inputStr, ok := handoffInput.(string); ok {
-				contextInfo := fmt.Sprintf("\n\nTask Context:\n- Task ID: %s\n", currentTask.TaskID)
+			// Append context information as a new message in the conversation array
+			contextInfo := fmt.Sprintf("Task Context:\n- Task ID: %s\n", currentTask.TaskID)
 
-				if currentTask.TaskDescription != "" {
-					contextInfo += fmt.Sprintf("- Description: %s\n", currentTask.TaskDescription)
-				}
-
-				if currentTask.WorkingContext.ArtifactType != "" {
-					contextInfo += fmt.Sprintf("- Artifact Type: %s\n", currentTask.WorkingContext.ArtifactType)
-				}
-
-				enhancedInput = inputStr + contextInfo
-			} else if inputMap, ok := handoffInput.(map[string]interface{}); ok {
-				// If the input is a map, we can add context as additional fields
-				inputMap["task_id"] = currentTask.TaskID
-				inputMap["task_context"] = currentTask.WorkingContext
-				enhancedInput = inputMap
+			if currentTask.TaskDescription != "" {
+				contextInfo += fmt.Sprintf("- Description: %s\n", currentTask.TaskDescription)
 			}
+
+			if currentTask.WorkingContext.ArtifactType != "" {
+				contextInfo += fmt.Sprintf("- Artifact Type: %s\n", currentTask.WorkingContext.ArtifactType)
+			}
+
+			// Append context as a new system message
+			enhancedInput = append(enhancedInput, map[string]interface{}{
+				"type":    "message",
+				"role":    "system",
+				"content": contextInfo,
+			})
 		}
 
 		// Record handoff event
@@ -2134,17 +2131,15 @@ func (r *Runner) handleHandoff(
 			newTaskID = r.createTask(currentAgent.Name, handoffAgent.Name)
 		}
 
-		// Set task description if input is a string
-		if inputStr, ok := handoffInput.(string); ok {
-			if len(inputStr) > 100 {
-				r.getTask(newTaskID).SetDescription(inputStr[:100] + "...")
-			} else {
-				r.getTask(newTaskID).SetDescription(inputStr)
-			}
+		// Set task description using the handoff input string
+		if len(handoffInputStr) > 100 {
+			r.getTask(newTaskID).SetDescription(handoffInputStr[:100] + "...")
+		} else {
+			r.getTask(newTaskID).SetDescription(handoffInputStr)
 		}
 
 		// Add initial interaction
-		r.addTaskInteraction(newTaskID, currentAgent.Name, handoffInput)
+		r.addTaskInteraction(newTaskID, currentAgent.Name, handoffInputStr)
 
 		// Enhance input with context from current work if available
 		enhancedInput := handoffInput
@@ -2153,25 +2148,23 @@ func (r *Runner) handleHandoff(
 			artifact := currentTask.WorkingContext.Artifact
 			artifactType := currentTask.WorkingContext.ArtifactType
 
-			// Create an enhanced input that includes the artifact
-			if inputStr, ok := handoffInput.(string); ok {
-				// For string inputs, we can include artifact info in the input
-				artifactInfo := ""
-				if artifactType == "code" {
-					if codeStr, ok := artifact.(string); ok {
-						artifactInfo = fmt.Sprintf("\n\nHere is the code that was previously worked on:\n```\n%s\n```\n", codeStr)
-					}
+			// Append artifact info as a new message in the conversation array
+			var artifactInfo string
+			if artifactType == "code" {
+				if codeStr, ok := artifact.(string); ok {
+					artifactInfo = fmt.Sprintf("Here is the code that was previously worked on:\n```\n%s\n```\n", codeStr)
 				}
+			} else {
+				artifactInfo = fmt.Sprintf("Context artifact: %v", artifact)
+			}
 
-				enhancedInput = inputStr + artifactInfo
-			} else if inputMap, ok := handoffInput.(map[string]interface{}); ok {
-				// For map inputs, we can add the artifact as a field
-				if artifactType == "code" {
-					inputMap["code_context"] = artifact
-				} else {
-					inputMap["context"] = artifact
-				}
-				enhancedInput = inputMap
+			// Append artifact as a new system message
+			if artifactInfo != "" {
+				enhancedInput = append(enhancedInput, map[string]interface{}{
+					"type":    "message",
+					"role":    "system",
+					"content": artifactInfo,
+				})
 			}
 
 			// Also set the artifact in the new task

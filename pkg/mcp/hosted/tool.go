@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/mcp"
-	"github.com/Muhammadhamd/go-agentkit/pkg/tool"
+	"github.com/muhammadhamd/go-agentkit/pkg/mcp"
+	"github.com/muhammadhamd/go-agentkit/pkg/tool"
 )
 
 // HostedMCPTool represents a tool that executes on a remote MCP server
@@ -38,6 +38,7 @@ type HostedMCPToolConfig struct {
 
 // NewHostedMCPTool creates a new hosted MCP tool
 func NewHostedMCPTool(config HostedMCPToolConfig) (tool.Tool, error) {
+	fmt.Println("NewHostedMCPTool", config)
 	if config.ServerURL == "" {
 		return nil, fmt.Errorf("server URL is required")
 	}

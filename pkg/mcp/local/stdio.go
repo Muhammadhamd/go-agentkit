@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/mcp"
+	"github.com/muhammadhamd/go-agentkit/pkg/mcp"
 )
 
 // StdioServer wraps an MCP server running as a subprocess communicating via stdio

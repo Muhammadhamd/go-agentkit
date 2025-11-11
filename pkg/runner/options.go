@@ -3,7 +3,7 @@ package runner
 import (
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/model"
+	"github.com/muhammadhamd/go-agentkit/pkg/model"
 )
 
 // RunOptions configures a run

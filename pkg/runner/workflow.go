@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Muhammadhamd/go-agentkit/pkg/agent"
-	"github.com/Muhammadhamd/go-agentkit/pkg/result"
+	"github.com/muhammadhamd/go-agentkit/pkg/agent"
+	"github.com/muhammadhamd/go-agentkit/pkg/result"
 )
 
 // WorkflowRunner extends the base Runner with workflow capabilities
@@ -38,6 +38,13 @@ func (wh *workflowHooks) OnRunStart(ctx context.Context, agent *agent.Agent, inp
 	return nil
 }
 
+func (wh *workflowHooks) OnAgentStart(ctx context.Context, agent AgentType, input interface{}) error {
+	if wh.baseHooks != nil {
+		return wh.baseHooks.OnAgentStart(ctx, agent, input)
+	}
+	return nil
+}
+
 func (wh *workflowHooks) OnTurnStart(ctx context.Context, agent *agent.Agent, turn int) error {
 	if wh.baseHooks != nil {
 		return wh.baseHooks.OnTurnStart(ctx, agent, turn)
@@ -55,6 +62,13 @@ func (wh *workflowHooks) OnTurnEnd(ctx context.Context, agent *agent.Agent, turn
 func (wh *workflowHooks) OnRunEnd(ctx context.Context, result *result.RunResult) error {
 	if wh.baseHooks != nil {
 		return wh.baseHooks.OnRunEnd(ctx, result)
+	}
+	return nil
+}
+
+func (wh *workflowHooks) OnHandoff(ctx context.Context, fromAgent AgentType, toAgent AgentType) error {
+	if wh.baseHooks != nil {
+		return wh.baseHooks.OnHandoff(ctx, fromAgent, toAgent)
 	}
 	return nil
 }

@@ -134,4 +134,82 @@ Make your responses helpful and to the point.`)
 
 	fmt.Println("\nFinal output:")
 	fmt.Println(streamResult.RunResult.FinalOutput)
+
+	// Example: Run the agent with a conversation array
+	fmt.Println("\n\n=== Running agent with conversation array ===")
+
+	// Create a conversation array with previous messages
+	// This simulates continuing a conversation with context
+	conversationArray := []interface{}{
+		// User message
+		map[string]interface{}{
+			"type":    "message",
+			"role":    "user",
+			"content": "Hello! What time is it?",
+		},
+		// Assistant's previous response with tool call
+		map[string]interface{}{
+			"type":    "message",
+			"role":    "assistant",
+			"content": "",
+			"tool_calls": []map[string]interface{}{
+				{
+					"id":   "call_time_001",
+					"type": "function",
+					"function": map[string]interface{}{
+						"name":      "get_current_time",
+						"arguments": `{"format": "kitchen"}`,
+					},
+				},
+			},
+		},
+		// Tool result
+		map[string]interface{}{
+			"type": "tool_result",
+			"tool_call": map[string]interface{}{
+				"id":   "call_time_001", // Must match the tool_call ID above
+				"name": "get_current_time",
+			},
+			"tool_result": map[string]interface{}{
+				"content": "3:45PM",
+			},
+		},
+		// Assistant's response after tool execution
+		map[string]interface{}{
+			"type":    "message",
+			"role":    "assistant",
+			"content": "The current time is 3:45PM.",
+		},
+		// User's follow-up question
+		map[string]interface{}{
+			"type":    "message",
+			"role":    "user",
+			"content": "Can you tell me the time in RFC3339 format?",
+		},
+	}
+
+	// Run the agent with the conversation array
+	result, err = runner.Run(context.Background(), agent, &RunOptions{
+		Input: conversationArray,
+	})
+	if err != nil {
+		log.Fatalf("Error running agent with conversation array: %v", err)
+	}
+
+	// Print the result
+	fmt.Println("\nAgent response (with conversation context):")
+	fmt.Println(result.FinalOutput)
+
+	// Print usage statistics
+	if result.RunContext != nil {
+		if runCtx, ok := result.RunContext.(*runner.RunContext); ok && runCtx != nil {
+			if runCtx.Usage != nil {
+				fmt.Println("\nUsage Statistics:")
+				fmt.Printf("  Requests: %d\n", runCtx.Usage.Requests)
+				fmt.Printf("  Input Tokens: %d\n", runCtx.Usage.InputTokens)
+				fmt.Printf("  Output Tokens: %d\n", runCtx.Usage.OutputTokens)
+				fmt.Printf("  Total Tokens: %d\n", runCtx.Usage.TotalTokens)
+			}
+		}
+	}
 }

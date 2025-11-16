@@ -208,3 +208,6 @@ func (e *OpenAITracingExporter) Export(items []ExportableItem) error {
 
 	return fmt.Errorf("failed to export traces after %d attempts", e.options.MaxRetries)
 }
+
+
+

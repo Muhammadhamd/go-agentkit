@@ -481,6 +481,96 @@ if err := json.Unmarshal([]byte(result.FinalOutput.(string)), &report); err == n
 }
 ```
 
+### Example 5: Conversation Array Input
+
+Provide conversation history as input to continue a conversation:
+
+```go
+// Create a conversation array with previous messages
+conversationArray := []interface{}{
+	// System message
+	map[string]interface{}{
+		"type":    "message",
+		"role":    "system",
+		"content": "You are a helpful assistant.",
+	},
+	
+	// User message
+	map[string]interface{}{
+		"type":    "message",
+		"role":    "user",
+		"content": "What is the capital of Pakistan?",
+	},
+	
+	// Assistant message with tool call (REQUIRED before tool_result)
+	map[string]interface{}{
+		"type":    "message",
+		"role":    "assistant",
+		"content": "",
+		"tool_calls": []map[string]interface{}{
+			{
+				"id":   "call_research_001",
+				"type": "function",
+				"function": map[string]interface{}{
+					"name":      "research_tool",
+					"arguments": `{}`,
+				},
+			},
+		},
+	},
+	
+	// Tool result (response to the tool call above)
+	map[string]interface{}{
+		"type": "tool_result",
+		"tool_call": map[string]interface{}{
+			"id":   "call_research_001", // Must match the tool_call ID above
+			"name": "research_tool",
+		},
+		"tool_result": map[string]interface{}{
+			"content": "Islamabad",
+		},
+	},
+	
+	// Assistant's final response
+	map[string]interface{}{
+		"type":    "message",
+		"role":    "assistant",
+		"content": "The capital of Pakistan is Islamabad.",
+	},
+	
+	// User follow-up question
+	map[string]interface{}{
+		"type":    "message",
+		"role":    "user",
+		"content": "What's the population?",
+	},
+}
+
+// Run with conversation array
+result, err := r.RunSync(agent, &runner.RunOptions{
+	Input: conversationArray,
+})
+
+// Print usage statistics
+if result.RunContext != nil {
+	if runCtx, ok := result.RunContext.(*runner.RunContext); ok && runCtx != nil {
+		if runCtx.Usage != nil {
+			fmt.Printf("Requests: %d\n", runCtx.Usage.Requests)
+			fmt.Printf("Input Tokens: %d\n", runCtx.Usage.InputTokens)
+			fmt.Printf("Output Tokens: %d\n", runCtx.Usage.OutputTokens)
+			fmt.Printf("Total Tokens: %d\n", runCtx.Usage.TotalTokens)
+		}
+	}
+}
+```
+
+**Important Notes:**
+- **Message Format**: All messages must have `"type": "message"` with `"role": "user"`, `"role": "assistant"`, or `"role": "system"`
+- **Tool Calls**: Assistant messages with tool calls must include `"tool_calls"` array with `"id"`, `"type": "function"`, and `"function"` object
+- **Tool Results**: Tool results use `"type": "tool_result"` with `"tool_call"` and `"tool_result"` objects
+- **ID Matching**: The `tool_call` ID in the assistant message must match the `tool_call.id` in the corresponding `tool_result`
+- **Order Matters**: Tool results must come immediately after the assistant message with matching tool calls
+
 See more examples in the [examples directory](./examples).
 
 ## 🖥️ Provider Setup

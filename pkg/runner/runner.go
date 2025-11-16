@@ -1004,12 +1004,30 @@ func (r *Runner) executeToolCall(ctx context.Context, agent AgentType, tc model.
 			err
 	}
 
-	// Record tool call event
-	tracing.ToolCall(ctx, agent.Name, tc.Name, tc.Parameters)
+	// Get or generate tool call ID BEFORE executing tool
+	toolCallID := tc.ID
+	if toolCallID == "" {
+		// Generate a tool call ID in the same format as OpenAI's: "call_<random_string>"
+		randomBytes := make([]byte, 8)
+		if _, err := rand.Read(randomBytes); err != nil {
+			toolCallID = fmt.Sprintf("call_%d_%d", turn, idx)
+		} else {
+			toolCallID = fmt.Sprintf("call_%x", randomBytes)
+		}
+	}
+
+	// Inject tool call ID and tool name into context
+	// Context automatically replaces old values with same key, so each tool call
+	// will replace the previous tool's ID in context (only current tool's ID is available)
+	toolCtx := context.WithValue(ctx, "tool_call_id", toolCallID)
+	toolCtx = context.WithValue(toolCtx, "tool_name", tc.Name)
+
+	// Record tool call event (ID context mein hai, automatically trace mein jayega)
+	tracing.ToolCall(toolCtx, agent.Name, tc.Name, tc.Parameters)
 
 	// Call agent hooks if provided
 	if agent.Hooks != nil {
-		if err := agent.Hooks.OnBeforeToolCall(ctx, agent, toolToCall, tc.Parameters); err != nil {
+		if err := agent.Hooks.OnBeforeToolCall(toolCtx, agent, toolToCall, tc.Parameters); err != nil {
 			return createToolResultForError(tc, err, turn, idx),
 				&result.ToolCallItem{
 					Name:       tc.Name,
@@ -1023,15 +1041,15 @@ func (r *Runner) executeToolCall(ctx context.Context, agent AgentType, tc model.
 		}
 	}
 
-	// Execute the tool
-	toolResult, err := toolToCall.Execute(ctx, tc.Parameters)
+	// Execute the tool (context mein current tool ki ID hai)
+	toolResult, err := toolToCall.Execute(toolCtx, tc.Parameters)
 
-	// Record tool result event
-	tracing.ToolResult(ctx, agent.Name, tc.Name, toolResult, err)
+	// Record tool result event (ID context mein hai, automatically trace mein jayega)
+	tracing.ToolResult(toolCtx, agent.Name, tc.Name, toolResult, err)
 
 	// Call agent hooks if provided
 	if agent.Hooks != nil {
-		if hookErr := agent.Hooks.OnAfterToolCall(ctx, agent, toolToCall, toolResult, err); hookErr != nil {
+		if hookErr := agent.Hooks.OnAfterToolCall(toolCtx, agent, toolToCall, toolResult, err); hookErr != nil {
 			return createToolResultForError(tc, hookErr, turn, idx),
 				&result.ToolCallItem{
 					Name:       tc.Name,
@@ -1056,23 +1074,11 @@ func (r *Runner) executeToolCall(ctx context.Context, agent AgentType, tc model.
 		Parameters: tc.Parameters,
 	}
 
-	// Create the tool result item
+	// Create the tool result item (toolCallID already generated above)
 	toolResultItem := &result.ToolResultItem{
-		Name:   tc.Name,
-		Result: toolResult,
-	}
-
-	// Use the actual ID from the tool call if available, otherwise generate one
-	// For OpenAI, the tool call ID format is important and should be consistent
-	toolCallID := tc.ID
-	if toolCallID == "" {
-		// Generate a tool call ID in the same format as OpenAI's: "call_<random_string>"
-		randomBytes := make([]byte, 8)
-		if _, err := rand.Read(randomBytes); err != nil {
-			toolCallID = fmt.Sprintf("call_%d_%d", turn, idx)
-		} else {
-			toolCallID = fmt.Sprintf("call_%x", randomBytes)
-		}
+		Name:       tc.Name,
+		Result:     toolResult,
+		ToolCallID: toolCallID,
 	}
 
 	// Detect if the provider is Anthropic based on model provider name

@@ -113,6 +113,7 @@ The Go Agent SDK is a powerful, production-ready framework for building AI agent
 - ✅ **Tool Error Handling** - Custom error handling for tool failures
 - ✅ **Tool Approval** - Human-in-the-loop approval for sensitive tool calls
 - ✅ **Tool Use Behavior** - Control how agents handle tool outputs (run_llm_again, stop_on_first_tool, custom)
+- ✅ **Tool Call ID Access** - Access the current tool call ID from within your tool functions via context
 
 ### 👥 Multi-Agent Features
 - ✅ **Agent Handoffs** - Transfer control between specialized agents
@@ -455,7 +456,68 @@ for event := range streamResult.Stream {
 }
 ```
 
-### Example 4: Structured Output
+### Example 4: Accessing Tool Call ID
+
+Access the current tool call ID from within your tool functions:
+
+```go
+// Tool that accesses its own tool call ID
+func myTool(ctx context.Context, params map[string]interface{}) (interface{}, error) {
+    // Get tool call ID from context
+    toolCallID := ""
+    if idVal := ctx.Value("tool_call_id"); idVal != nil {
+        if id, ok := idVal.(string); ok {
+            toolCallID = id
+        }
+    }
+    
+    // Get tool name from context
+    toolName := ""
+    if nameVal := ctx.Value("tool_name"); nameVal != nil {
+        if name, ok := nameVal.(string); ok {
+            toolName = name
+        }
+    }
+    
+    // Use the tool call ID (e.g., for logging, tracing, or database operations)
+    fmt.Printf("Tool: %s, Call ID: %s\n", toolName, toolCallID)
+    
+    // The tool call ID is automatically:
+    // - Generated before tool execution
+    // - Available in context during tool execution
+    // - Saved in tracing and raw responses
+    // - Replaced when a new tool is called (only current tool's ID is available)
+    
+    return map[string]interface{}{
+        "tool_name":    toolName,
+        "tool_call_id": toolCallID,
+        "result":       "Tool executed successfully",
+    }, nil
+}
+
+// Create and use the tool
+getToolCallIDTool := tool.NewFunctionTool(
+    "get_tool_call_id",
+    "Gets the current tool call ID from context",
+    myTool,
+)
+
+agent := agent.NewAgent("Test Agent")
+agent.WithTools(getToolCallIDTool)
+
+result, err := r.RunSync(agent, &runner.RunOptions{
+    Input: "Call get_tool_call_id to test the tool call ID feature",
+})
+```
+
+**Key Points:**
+- Tool call ID is automatically generated before tool execution
+- Available in context via `ctx.Value("tool_call_id")` and `ctx.Value("tool_name")`
+- Only the **current** tool's ID is available in context (previous tool IDs are automatically removed)
+- Tool call ID is automatically saved in tracing events and raw responses
+- Useful for logging, debugging, tracing, and correlating tool calls with results
+
+### Example 5: Structured Output
 
 Get responses as Go structs:
 
@@ -703,7 +765,7 @@ if result.RunContext != nil {
 
 #### Accessing Context in Tools
 
-Tools can access and modify the shared context:
+Tools can access and modify the shared context, and also access their own tool call ID:
 
 ```go
 func myTool(ctx context.Context, params map[string]interface{}) (interface{}, error) {
@@ -719,6 +781,16 @@ func myTool(ctx context.Context, params map[string]interface{}) (interface{}, er
                 myCtx.Metadata["last_tool_called"] = "myTool"
                 myCtx.Metadata["called_at"] = time.Now()
             }
+        }
+    }
+    
+    // Access current tool call ID (automatically available in context)
+    toolCallID := ""
+    if idVal := ctx.Value("tool_call_id"); idVal != nil {
+        if id, ok := idVal.(string); ok {
+            toolCallID = id
+            // Use tool call ID for logging, tracing, or database operations
+            fmt.Printf("Executing tool with ID: %s\n", toolCallID)
         }
     }
     

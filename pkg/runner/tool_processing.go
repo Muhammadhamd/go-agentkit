@@ -287,20 +287,7 @@ func (r *Runner) executeFunctionTools(
 		}
 		runItems = append(runItems, toolCallItem)
 
-		// Call agent hooks
-		if agent.Hooks != nil {
-			if err := agent.Hooks.OnBeforeToolCall(ctx, agent, t, tc.Parameters); err != nil {
-				return nil, nil, fmt.Errorf("before tool call hook error: %w", err)
-			}
-		}
-
-		// Inject RunContext into context for tool access
-		toolCtx := context.WithValue(ctx, "run_context", state.RunContext)
-
-		// Execute the tool
-		toolResult, err := t.Execute(toolCtx, tc.Parameters)
-
-		// Get or generate tool call ID
+		// Get or generate tool call ID BEFORE executing tool
 		toolCallID := tc.ID
 		if toolCallID == "" {
 			randomBytes := make([]byte, 8)
@@ -311,6 +298,23 @@ func (r *Runner) executeFunctionTools(
 			}
 		}
 
+		// Inject RunContext, tool call ID, and tool name into context
+		// Context automatically replaces old values with same key, so each tool call
+		// will replace the previous tool's ID in context (only current tool's ID is available)
+		toolCtx := context.WithValue(ctx, "run_context", state.RunContext)
+		toolCtx = context.WithValue(toolCtx, "tool_call_id", toolCallID)
+		toolCtx = context.WithValue(toolCtx, "tool_name", tc.Name)
+
+		// Call agent hooks (use toolCtx so hooks can access tool call ID)
+		if agent.Hooks != nil {
+			if err := agent.Hooks.OnBeforeToolCall(toolCtx, agent, t, tc.Parameters); err != nil {
+				return nil, nil, fmt.Errorf("before tool call hook error: %w", err)
+			}
+		}
+
+		// Execute the tool (context mein current tool ki ID hai)
+		toolResult, err := t.Execute(toolCtx, tc.Parameters)
+
 		// Create tool result item
 		toolResultItem := &result.ToolResultItem{
 			Name:       tc.Name,
@@ -319,9 +323,9 @@ func (r *Runner) executeFunctionTools(
 		}
 		runItems = append(runItems, toolResultItem)
 
-		// Call agent hooks
+		// Call agent hooks (use toolCtx so hooks can access tool call ID)
 		if agent.Hooks != nil {
-			if hookErr := agent.Hooks.OnAfterToolCall(ctx, agent, t, toolResult, err); hookErr != nil {
+			if hookErr := agent.Hooks.OnAfterToolCall(toolCtx, agent, t, toolResult, err); hookErr != nil {
 				return nil, nil, fmt.Errorf("after tool call hook error: %w", hookErr)
 			}
 		}

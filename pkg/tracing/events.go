@@ -31,22 +31,50 @@ func AgentEnd(ctx context.Context, agentName string, output interface{}) {
 
 // ToolCall records a tool call event
 func ToolCall(ctx context.Context, agentName string, toolName string, parameters interface{}) {
+	// Get tool call ID from context if available
+	toolCallID := ""
+	if idVal := ctx.Value("tool_call_id"); idVal != nil {
+		if id, ok := idVal.(string); ok {
+			toolCallID = id
+		}
+	}
+
+	details := map[string]interface{}{
+		"tool_name":  toolName,
+		"parameters": parameters,
+	}
+
+	// Add tool call ID to trace details if available
+	if toolCallID != "" {
+		details["tool_call_id"] = toolCallID
+	}
+
 	RecordEventContext(ctx, Event{
 		Type:      EventTypeToolCall,
 		AgentName: agentName,
 		Timestamp: time.Now(),
-		Details: map[string]interface{}{
-			"tool_name":  toolName,
-			"parameters": parameters,
-		},
+		Details:   details,
 	})
 }
 
 // ToolResult records a tool result event
 func ToolResult(ctx context.Context, agentName string, toolName string, result interface{}, err error) {
+	// Get tool call ID from context if available
+	toolCallID := ""
+	if idVal := ctx.Value("tool_call_id"); idVal != nil {
+		if id, ok := idVal.(string); ok {
+			toolCallID = id
+		}
+	}
+
 	details := map[string]interface{}{
 		"tool_name": toolName,
 		"result":    result,
+	}
+
+	// Add tool call ID to trace details if available
+	if toolCallID != "" {
+		details["tool_call_id"] = toolCallID
 	}
 
 	event := Event{

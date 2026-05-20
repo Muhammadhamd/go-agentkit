@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>go-agentkit — AI Agent SDK for Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg2: #0f1521;
+    --bg3: #141c2e;
+    --surface: #1a2540;
+    --surface2: #1f2d4d;
+    --border: #2a3a5c;
+    --border2: #1e3055;
+    --green: #00d4a0;
+    --green2: #00ffbe;
+    --green-dim: rgba(0,212,160,0.12);
+    --green-glow: rgba(0,212,160,0.25);
+    --blue: #4da6ff;
+    --blue-dim: rgba(77,166,255,0.1);
+    --orange: #ff9f43;
+    --red: #ff6b6b;
+    --text: #d4e0f7;
+    --text2: #8ba0c4;
+    --text3: #556080;
+    --white: #f0f6ff;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-display: 'Syne', sans-serif;
+    --radius: 8px;
+    --radius-lg: 16px;
+    --transition: 0.2s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,160,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border2);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .logo-wrap {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .logo-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--green);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .logo-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-name span { color: var(--green); }
+
+  .logo-version {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,212,160,0.2);
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+
+  .nav-section {
+    padding: 20px 16px 8px;
+  }
+
+  .nav-section-title {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0 8px;
+    margin-bottom: 6px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: var(--radius);
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    background: var(--green-dim);
+    color: var(--green);
+  }
+
+  .nav-icon {
+    width: 16px;
+    text-align: center;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .nav-link.active .nav-icon { opacity: 1; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border2);
+  }
+
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,212,160,0.2); }
+  .badge-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,166,255,0.2); }
+  .badge-orange { background: rgba(255,159,67,0.1); color: var(--orange); border: 1px solid rgba(255,159,67,0.2); }
+
+  .sidebar-links { display: flex; flex-direction: column; gap: 4px; }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text3);
+    text-decoration: none;
+    font-size: 11px;
+    transition: color var(--transition);
+  }
+  .sidebar-link:hover { color: var(--green); }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 260px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    display: none;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 48px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 80px 48px 64px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,212,160,0.25);
+    background: var(--green-dim);
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .pulse {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 .accent { color: var(--green); }
+
+  .hero-desc {
+    font-size: 16px;
+    color: var(--text2);
+    max-width: 600px;
+    line-height: 1.8;
+    margin-bottom: 36px;
+    font-family: var(--font-mono);
+    font-weight: 300;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: #000;
+  }
+  .btn-primary:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 8px 24px var(--green-glow); }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--green); color: var(--green); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+
+  .stat {
+    background: var(--bg2);
+    padding: 24px 20px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--green);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+
+  .section-lead {
+    color: var(--text2);
+    font-size: 14px;
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border2);
+    margin: 40px 0;
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg3);
+  }
+
+  .code-lang {
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .copy-btn:hover { color: var(--green); border-color: var(--green); }
+
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .kw { color: #ff7eb3; }
+  .fn { color: #82b1ff; }
+  .str { color: #a8e6cf; }
+  .cm { color: var(--text3); font-style: italic; }
+  .ty { color: #ffd54f; }
+  .nt { color: var(--green); }
+  .nm { color: #e8def8; }
+
+  /* ── FEATURE GRID ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .feature-card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--green);
+    background: var(--bg3);
+    transform: translateY(-2px);
+  }
+
+  .feature-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .feature-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .feature-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── PACKAGE LIST ── */
+  .pkg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+
+  .pkg-item {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all var(--transition);
+  }
+
+  .pkg-item:hover { border-color: var(--blue); }
+
+  .pkg-path {
+    font-size: 12px;
+    color: var(--blue);
+    word-break: break-all;
+  }
+
+  .pkg-desc {
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  /* ── PROVIDER TABS ── */
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text2);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-bottom: -1px;
+  }
+
+  .tab:hover, .tab.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── CHECKLIST ── */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .check {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 9px;
+    color: var(--green);
+  }
+
+  /* ── INLINE CODE ── */
+  code {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: var(--green);
+    font-family: var(--font-mono);
+  }
+
+  /* ── ALERT BOXES ── */
+  .alert {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-left: 3px solid;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .alert-info { background: var(--blue-dim); border-color: var(--blue); color: var(--text); }
+  .alert-warn { background: rgba(255,159,67,0.08); border-color: var(--orange); color: var(--text); }
+  .alert-success { background: var(--green-dim); border-color: var(--green); color: var(--text); }
+
+  .alert strong { display: block; margin-bottom: 4px; font-weight: 600; }
+  .alert-info strong { color: var(--blue); }
+  .alert-warn strong { color: var(--orange); }
+  .alert-success strong { color: var(--green); }
+
+  /* ── EXAMPLE TABLE ── */
+  .ex-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  .ex-table th {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: var(--bg3);
+  }
+
+  .ex-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border2);
+    color: var(--text2);
+    vertical-align: top;
+  }
+
+  .ex-table tr:hover td { background: var(--green-dim); }
+
+  .ex-table td:first-child { color: var(--blue); font-weight: 500; }
+
+  /* ── ENV VARS ── */
+  .env-item {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .env-key {
+    font-size: 12px;
+    color: var(--orange);
+    font-weight: 500;
+    min-width: 280px;
+    flex-shrink: 0;
+    word-break: break-all;
+  }
+
+  .env-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-diagram {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .flow-node-label {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    display: block;
+  }
+
+  .flow-node-sub {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 3px;
+  }
+
+  .flow-arrow {
+    padding: 0 12px;
+    color: var(--green);
+    font-size: 18px;
+    font-weight: 300;
+  }
+
+  .flow-node.highlight {
+    border-color: var(--green);
+    background: var(--green-dim);
+  }
+
+  .flow-node.highlight .flow-node-label { color: var(--green); }
+
+  /* ── VERSIONS TABLE ── */
+  .version-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border2);
+    font-size: 13px;
+  }
+
+  .version-row:last-child { border-bottom: none; }
+
+  .version-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--blue);
+    min-width: 80px;
+    font-weight: 500;
+  }
+
+  .version-date { color: var(--text3); font-size: 11px; min-width: 120px; }
+  .version-notes { color: var(--text2); flex: 1; }
+
+  .latest-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,212,160,0.3);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  /* ── CLOUD CTA ── */
+  .cloud-cta {
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin: 32px 0;
+  }
+
+  .cloud-cta::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+  }
+
+  .cloud-cta h3 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--white);
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  .cloud-cta p {
+    color: var(--text2);
+    font-size: 14px;
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cloud-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .cloud-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { width: 220px; }
+    .main { margin-left: 220px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .feature-grid, .pkg-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .section { padding: 32px 20px; }
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 32px;
+  }
+
+  .toc-title {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .toc ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+  .toc a {
+    font-size: 12px;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .toc a:hover { color: var(--green); }
+
+  /* ── NEXT STEP ── */
+  .next-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 24px 0;
+  }
+
+  .next-step {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-align: center;
+  }
+
+  .next-step:hover {
+    border-color: var(--green);
+    background: var(--green-dim);
+  }
+
+  .next-step-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .next-step-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 6px; }
+  .next-step-desc { font-size: 11px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-tag">▸ go package</div>
+    <div class="logo-name">go-<span>agentkit</span></div>
+    <span class="logo-version">v0.10.2 · latest</span>
+  </div>
+
+  <nav>
+    <div class="nav-section">
+      <div class="nav-section-title">Overview</div>
+      <button class="nav-link active" onclick="show('overview')">
+        <span class="nav-icon">⊙</span> Introduction
+      </button>
+      <button class="nav-link" onclick="show('install')">
+        <span class="nav-icon">↓</span> Installation
+      </button>
+      <button class="nav-link" onclick="show('quickstart')">
+        <span class="nav-icon">▶</span> Quick Start
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Core Concepts</div>
+      <button class="nav-link" onclick="show('agent')">
+        <span class="nav-icon">⬡</span> Agent
+      </button>
+      <button class="nav-link" onclick="show('runner')">
+        <span class="nav-icon">⟳</span> Runner
+      </button>
+      <button class="nav-link" onclick="show('tools')">
+        <span class="nav-icon">⚙</span> Tools
+      </button>
+      <button class="nav-link" onclick="show('providers')">
+        <span class="nav-icon">◈</span> Providers
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Advanced</div>
+      <button class="nav-link" onclick="show('multiagent')">
+        <span class="nav-icon">⬡⬡</span> Multi-Agent
+      </button>
+      <button class="nav-link" onclick="show('context')">
+        <span class="nav-icon">⟨⟩</span> Context Sharing
+      </button>
+      <button class="nav-link" onclick="show('streaming')">
+        <span class="nav-icon">≈</span> Streaming
+      </button>
+      <button class="nav-link" onclick="show('tracing')">
+        <span class="nav-icon">◎</span> Tracing
+      </button>
+      <button class="nav-link" onclick="show('workflow')">
+        <span class="nav-icon">⊟</span> Workflow State
+      </button>
+      <button class="nav-link" onclick="show('mcp')">
+        <span class="nav-icon">⌁</span> MCP Support
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <button class="nav-link" onclick="show('packages')">
+        <span class="nav-icon">◻</span> Packages
+      </button>
+      <button class="nav-link" onclick="show('examples')">
+        <span class="nav-icon">⌕</span> Examples
+      </button>
+      <button class="nav-link" onclick="show('envvars')">
+        <span class="nav-icon">$</span> Env Variables
+      </button>
+      <button class="nav-link" onclick="show('contributing')">
+        <span class="nav-icon">⊕</span> Contributing
+      </button>
+      <button class="nav-link" onclick="show('versions')">
+        <span class="nav-icon">◷</span> Versions
+      </button>
+      <button class="nav-link" onclick="show('cloud')">
+        <span class="nav-icon">☁</span> Cloud
+      </button>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="badge-row">
+      <span class="badge badge-green">MIT License</span>
+      <span class="badge badge-blue">Go 1.23+</span>
+      <span class="badge badge-orange">96.3% Go</span>
+    </div>
+    <div class="sidebar-links">
+      <a href="https://github.com/Muhammadhamd/go-agentkit" class="sidebar-link" target="_blank">⬡ GitHub Repository</a>
+      <a href="https://pkg.go.dev/github.com/Muhammadhamd/go-agentkit" class="sidebar-link" target="_blank">◻ pkg.go.dev</a>
+      <a href="https://go-agent.org" class="sidebar-link" target="_blank">◈ go-agent.org</a>
+      <a href="https://linkedin.com/in/MuhammadHamd" class="sidebar-link" target="_blank">⊙ Muhammad Hamd</a>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- OVERVIEW / HERO -->
+  <div id="section-overview" class="section active">
+    <div class="hero" style="padding-left:0;padding-right:0;">
+      <div class="hero-eyebrow">
+        <span class="pulse"></span>
+        Open Source · Production Ready
+      </div>
+      <h1>Build AI Agents<br>in <span class="accent">Go</span>. Fast.</h1>
+      <p class="hero-desc">
+        go-agentkit is an open-source framework for building powerful AI agents with Go. 
+        Multi-provider LLM support, function calling, agent handoffs, streaming, tracing — 
+        all in a lightweight, idiomatic Go SDK.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary" onclick="show('quickstart')">▶ Quick Start</button>
+        <a class="btn btn-secondary" href="https://github.com/Muhammadhamd/go-agentkit" target="_blank">⬡ GitHub</a>
+        <a class="btn btn-secondary" href="https://go-agent.org/#waitlist" target="_blank">☁ Cloud Waitlist</a>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><span class="stat-value">v1</span><span class="stat-label">Latest Release</span></div>
+        <div class="stat"><span class="stat-value">7</span><span class="stat-label">Releases</span></div>
+        <div class="stat"><span class="stat-value">3</span><span class="stat-label">LLM Providers</span></div>
+        <div class="stat"><span class="stat-value">MIT</span><span class="stat-label">License</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2>What is go-agentkit?</h2>
+    <p class="section-lead">
+      An open-source Go SDK for building intelligent AI agents — inspired by OpenAI's Python Agent SDK and Assistants API, 
+      ported to idiomatic Go with local LLM support and multi-provider compatibility.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">◈</span>
+        <div class="feature-title">Multi-Provider LLMs</div>
+        <div class="feature-desc">OpenAI (GPT-3.5/4/4o), Anthropic Claude (Haiku/Sonnet/Opus), LM Studio local models, DeepSeek, and any OpenAI-compatible API.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚙</span>
+        <div class="feature-title">Function Tools</div>
+        <div class="feature-desc">Convert any Go function into a tool callable by your agent. Auto JSON schema generation, validation, and error handling.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⬡⬡</span>
+        <div class="feature-title">Agent Handoffs</div>
+        <div class="feature-desc">Route tasks between specialized agents. Supports unidirectional and bidirectional flows with full context preservation.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">≈</span>
+        <div class="feature-title">Streaming</div>
+        <div class="feature-desc">Real-time token streaming with typed event channels — content, tool calls, handoffs, done — in an AsyncIterable pattern.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">◎</span>
+        <div class="feature-title">Tracing</div>
+        <div class="feature-desc">Built-in OpenAI-compatible tracing. Disable via env var. Per-run config. Matches Python/TypeScript SDK behavior.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⊟</span>
+        <div class="feature-title">Workflow State</div>
+        <div class="feature-desc">Persist state between agent runs. Retry with backoff, checkpointing, recovery functions, and validation rules.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⟨⟩</span>
+        <div class="feature-title">Context Sharing</div>
+        <div class="feature-desc">RunContext passes custom data and usage stats across all agents and tool calls in a workflow.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⌁</span>
+        <div class="feature-title">MCP Support</div>
+        <div class="feature-desc">Model Context Protocol — integrate local (stdio) and hosted (HTTP/SSE) MCP servers. Auto tool conversion.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 style="margin-top:0;">Repository Structure</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">tree</span></div>
+      <pre>go-agentkit/
+├── <span class="nt">pkg/</span>
+│   ├── <span class="nt">agent/</span>          <span class="cm">// Core Agent type</span>
+│   ├── <span class="nt">runner/</span>         <span class="cm">// Agentic loop + WorkflowRunner</span>
+│   ├── <span class="nt">tool/</span>           <span class="cm">// FunctionTool, schema, OpenAI compat</span>
+│   ├── <span class="nt">model/</span>          <span class="cm">// Model interfaces + streaming</span>
+│   │   └── <span class="nt">providers/</span>
+│   │       ├── <span class="nt">openai/</span>   <span class="cm">// OpenAI provider</span>
+│   │       ├── <span class="nt">anthropic/</span><span class="cm">// Anthropic Claude provider</span>
+│   │       └── <span class="nt">lmstudio/</span> <span class="cm">// LM Studio (local)</span>
+│   ├── <span class="nt">mcp/</span>            <span class="cm">// MCP client (local + hosted)</span>
+│   ├── <span class="nt">result/</span>         <span class="cm">// RunResult type</span>
+│   └── <span class="nt">tracing/</span>        <span class="cm">// Tracing internals</span>
+├── <span class="nt">examples/</span>           <span class="cm">// 10+ runnable examples</span>
+├── <span class="nt">test/</span>               <span class="cm">// Test suite + mocks</span>
+├── <span class="nt">scripts/</span>            <span class="cm">// lint, security, version</span>
+├── <span class="nt">docs/</span>               <span class="cm">// Additional documentation</span>
+├── <span class="nt">main.go</span>
+├── <span class="nt">types.go</span>
+├── <span class="nt">store.go</span>            <span class="cm">// Complex agentic flow test</span>
+└── <span class="nt">go.mod</span>              <span class="cm">// Requires Go 1.23+</span></pre>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Inspired by OpenAI SDK</strong>
+      Designed to match the behavior of OpenAI's Python and TypeScript Agent SDKs — same patterns, same tracing behavior, compatible tool definitions — but running natively in Go.
+    </div>
+  </div>
+
+  <!-- INSTALL -->
+  <div id="section-install" class="section">
+    <h2>Installation</h2>
+    <p class="section-lead">Requires Go 1.23 or later. Three ways to add go-agentkit to your project.</p>
+
+    <h3 style="margin-top:0;">Option 1 — go get (Recommended)</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>go get github.com/muhammadhamd/go-agentkit/</pre>
+    </div>
+
+    <h3>Option 2 — Import and tidy</h3>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px;">Add the imports to your Go files, then run:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span></div>
+      <pre><span class="kw">import</span> (
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/agent"</span>
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/runner"</span>
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/tool"</span>
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"</span>
+)</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>go mod tidy</pre>
+    </div>
+
+    <h3>Option 3 — Manual go.mod</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go.mod</span></div>
+      <pre>require github.com/muhammadhamd/go-agentkit/ latest</pre>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 style="margin-top:0;">New Project Setup</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm"># Create your project</span>
+mkdir my-agent && cd my-agent
+go mod init github.com/yourname/my-agent
+
+<span class="cm"># Install go-agentkit</span>
+go get github.com/muhammadhamd/go-agentkit/
+
+<span class="cm"># Set your API key</span>
+export OPENAI_API_KEY=sk-...</pre>
+    </div>
+
+    <div class="alert alert-warn">
+      <strong>⚠ Version Conflicts</strong>
+      Specify a version if you hit dependency conflicts: <code>go get github.com/muhammadhamd/go-agentkit/@v0.10.2</code>
+    </div>
+  </div>
+
+  <!-- QUICK START -->
+  <div id="section-quickstart" class="section">
+    <h2>Quick Start</h2>
+    <p class="section-lead">Build your first AI agent in Go — with a real tool call — in under 5 minutes.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-node"><span class="flow-node-label">Provider</span><span class="flow-node-sub">OpenAI / Claude</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node highlight"><span class="flow-node-label">Agent</span><span class="flow-node-sub">instructions + tools</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><span class="flow-node-label">Runner</span><span class="flow-node-sub">agentic loop</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><span class="flow-node-label">Result</span><span class="flow-node-sub">FinalOutput</span></div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">main.go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="kw">package</span> <span class="nm">main</span>
+
+<span class="kw">import</span> (
+    <span class="str">"context"</span>
+    <span class="str">"fmt"</span>
+    <span class="str">"log"</span>
+    <span class="str">"os"</span>
+
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/agent"</span>
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"</span>
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/runner"</span>
+    <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/tool"</span>
+)
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="cm">// 1. Provider — connects to OpenAI</span>
+    provider := openai.<span class="fn">NewProvider</span>(os.<span class="fn">Getenv</span>(<span class="str">"OPENAI_API_KEY"</span>))
+    provider.<span class="fn">SetDefaultModel</span>(<span class="str">"gpt-4o-mini"</span>)
+
+    <span class="cm">// 2. Tool — a Go function the agent can call</span>
+    getWeather := tool.<span class="fn">NewFunctionTool</span>(
+        <span class="str">"get_weather"</span>,
+        <span class="str">"Get the current weather for a city"</span>,
+        <span class="kw">func</span>(ctx context.Context, params <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}) (<span class="kw">interface</span>{}, <span class="ty">error</span>) {
+            city := params[<span class="str">"city"</span>].(<span class="ty">string</span>)
+            <span class="kw">return</span> fmt.<span class="fn">Sprintf</span>(<span class="str">"Weather in %s: 72°F, sunny."</span>, city), <span class="kw">nil</span>
+        },
+    ).<span class="fn">WithSchema</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+        <span class="str">"type"</span>: <span class="str">"object"</span>,
+        <span class="str">"properties"</span>: <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+            <span class="str">"city"</span>: <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+                <span class="str">"type"</span>: <span class="str">"string"</span>,
+                <span class="str">"description"</span>: <span class="str">"City name"</span>,
+            },
+        },
+        <span class="str">"required"</span>: []<span class="ty">string</span>{<span class="str">"city"</span>},
+    })
+
+    <span class="cm">// 3. Agent — wraps the LLM with instructions + tools</span>
+    assistant := agent.<span class="fn">NewAgent</span>(<span class="str">"Weather Assistant"</span>, <span class="str">"You are a weather assistant."</span>)
+    assistant.<span class="fn">SetModelProvider</span>(provider)
+    assistant.<span class="fn">WithModel</span>(<span class="str">"gpt-4o-mini"</span>)
+    assistant.<span class="fn">WithTools</span>(getWeather)
+
+    <span class="cm">// 4. Runner — executes the agentic loop</span>
+    r := runner.<span class="fn">NewRunner</span>()
+    r.<span class="fn">WithDefaultProvider</span>(provider)
+
+    result, err := r.<span class="fn">RunSync</span>(assistant, &runner.RunOptions{
+        Input: <span class="str">"What's the weather in Tokyo?"</span>,
+    })
+    <span class="kw">if</span> err != <span class="kw">nil</span> { log.<span class="fn">Fatal</span>(err) }
+
+    fmt.<span class="fn">Println</span>(result.FinalOutput)
+}</pre>
+    </div>
+
+    <h3>Run it</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>export OPENAI_API_KEY=sk-...
+go run main.go</pre>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>✓ What happened?</strong>
+      The agent received the input → decided to call <code>get_weather</code> with <code>city: "Tokyo"</code> → got the result → used it to compose the final answer. All automatic.
+    </div>
+
+    <div class="next-steps">
+      <div class="next-step" onclick="show('tools')">
+        <span class="next-step-icon">⚙</span>
+        <div class="next-step-title">Add More Tools</div>
+        <div class="next-step-desc">Build complex function tools with schemas</div>
+      </div>
+      <div class="next-step" onclick="show('multiagent')">
+        <span class="next-step-icon">⬡⬡</span>
+        <div class="next-step-title">Multi-Agent Flow</div>
+        <div class="next-step-desc">Orchestrate specialized agents</div>
+      </div>
+      <div class="next-step" onclick="show('streaming')">
+        <span class="next-step-icon">≈</span>
+        <div class="next-step-title">Stream Responses</div>
+        <div class="next-step-desc">Real-time output with event channels</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENT -->
+  <div id="section-agent" class="section">
+    <h2>Agent</h2>
+    <p class="section-lead">The <code>agent.Agent</code> is the core primitive — it encapsulates an LLM with instructions, tools, output type, and handoff targets.</p>
+
+    <h3 style="margin-top:0;">Creating an Agent</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Basic creation</span>
+a := agent.<span class="fn">NewAgent</span>(<span class="str">"My Agent"</span>, <span class="str">"You are a helpful assistant."</span>)
+
+<span class="cm">// Full configuration</span>
+a.<span class="fn">SetModelProvider</span>(provider)
+a.<span class="fn">WithModel</span>(<span class="str">"gpt-4o"</span>)
+a.<span class="fn">WithTools</span>(tool1, tool2, tool3)       <span class="cm">// multiple tools at once</span>
+a.<span class="fn">WithHandoffs</span>(billingAgent, supportAgent) <span class="cm">// delegation targets</span>
+a.<span class="fn">SetOutputType</span>(MyStruct{})              <span class="cm">// structured output</span></pre>
+    </div>
+
+    <h3>Agent Configuration Options</h3>
+    <table class="ex-table">
+      <thead><tr><th>Method</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>SetModelProvider(p)</td><td>Attach an LLM provider (OpenAI, Anthropic, LM Studio)</td></tr>
+        <tr><td>WithModel(name)</td><td>Override the model string (e.g. "gpt-4o", "claude-3-opus")</td></tr>
+        <tr><td>SetSystemInstructions(s)</td><td>Set the system prompt / persona</td></tr>
+        <tr><td>WithTools(tools...)</td><td>Add one or more FunctionTools</td></tr>
+        <tr><td>WithHandoffs(agents...)</td><td>Agents this agent can delegate to</td></tr>
+        <tr><td>SetOutputType(t)</td><td>Specify a Go struct for structured output parsing</td></tr>
+        <tr><td>AddToolFromDefinition(d)</td><td>Add an OpenAI-compatible tool definition directly</td></tr>
+        <tr><td>AddToolsFromDefinitions(ds)</td><td>Batch-add OpenAI tool definitions</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Tool Use Behavior</h3>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px;">Control what happens after a tool returns a result:</p>
+    <ul class="checklist">
+      <li><span class="check">✓</span><span><strong style="color:var(--white)">run_llm_again</strong> (default) — feed tool result back to the LLM and continue</span></li>
+      <li><span class="check">✓</span><span><strong style="color:var(--white)">stop_on_first_tool</strong> — return the tool result directly as final output</span></li>
+      <li><span class="check">✓</span><span><strong style="color:var(--white)">custom</strong> — define your own handler function</span></li>
+    </ul>
+
+    <div class="alert alert-info">
+      <strong>Backward Compatibility</strong>
+      All pre-refactor agent creation methods still work. Method chaining and direct field access are preserved alongside the new fluent API.
+    </div>
+  </div>
+
+  <!-- RUNNER -->
+  <div id="section-runner" class="section">
+    <h2>Runner</h2>
+    <p class="section-lead">The Runner drives the agentic loop — managing turns, tool execution, handoffs, and conversation state.</p>
+
+    <h3 style="margin-top:0;">Agentic Loop — How It Works</h3>
+    <div class="flow-diagram" style="flex-direction:column;align-items:flex-start;gap:0;">
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+        <div class="flow-node highlight" style="min-width:180px;"><span class="flow-node-label">Turn Start</span><span class="flow-node-sub">input + history</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="min-width:180px;"><span class="flow-node-label">Model Call</span><span class="flow-node-sub">LLM processes</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;padding-left:40px;">
+        <div class="flow-arrow" style="transform:rotate(90deg);">↓</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+        <div class="flow-node" style="min-width:180px;"><span class="flow-node-label">Process Response</span><span class="flow-node-sub">messages / tool calls</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="min-width:180px;"><span class="flow-node-label">Next Step</span><span class="flow-node-sub">run / handoff / done</span></div>
+      </div>
+    </div>
+
+    <h3>Next Step Types</h3>
+    <table class="ex-table">
+      <thead><tr><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>NextStepRunAgain</td><td>Continue the loop (after tool execution)</td></tr>
+        <tr><td>NextStepHandoff</td><td>Transfer control to another agent</td></tr>
+        <tr><td>NextStepFinalOutput</td><td>Agent produced a final answer — stop</td></tr>
+        <tr><td>NextStepInterruption</td><td>Pause for human approval or input</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Runner API</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Create a runner</span>
+r := runner.<span class="fn">NewRunner</span>()
+r.<span class="fn">WithDefaultProvider</span>(provider)
+
+<span class="cm">// Synchronous run</span>
+result, err := r.<span class="fn">RunSync</span>(myAgent, &runner.RunOptions{
+    Input:    <span class="str">"Process my request"</span>,
+    MaxTurns: <span class="nt">10</span>,             <span class="cm">// prevent infinite loops</span>
+    Context:  myCustomContext,  <span class="cm">// shared across agents</span>
+    RunConfig: &runner.RunConfig{
+        TracingDisabled: <span class="kw">false</span>,
+    },
+})
+
+<span class="cm">// Async run with context</span>
+result, err := r.<span class="fn">Run</span>(ctx, myAgent, &runner.RunOptions{...})
+
+<span class="cm">// Streaming</span>
+stream, err := r.<span class="fn">RunStreaming</span>(ctx, myAgent, &runner.RunOptions{...})
+
+<span class="cm">// Access result</span>
+fmt.<span class="fn">Println</span>(result.FinalOutput)
+fmt.<span class="fn">Println</span>(result.RunContext.(*runner.RunContext).Usage.TotalTokens)</pre>
+    </div>
+
+    <h3>RunOptions Reference</h3>
+    <table class="ex-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Input</td><td>string / interface{}</td><td>Initial user input or workflow state</td></tr>
+        <tr><td>MaxTurns</td><td>int</td><td>Maximum agent turns before stopping</td></tr>
+        <tr><td>Context</td><td>interface{}</td><td>Custom context shared across all agents</td></tr>
+        <tr><td>RunConfig</td><td>*RunConfig</td><td>Tracing, workflow, and other run-level settings</td></tr>
+        <tr><td>WorkflowConfig</td><td>*WorkflowConfig</td><td>Retry, state management, validation rules</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOOLS -->
+  <div id="section-tools" class="section">
+    <h2>Tools</h2>
+    <p class="section-lead">Tools let agents execute Go functions. The SDK handles JSON schema, parameter validation, error propagation, and OpenAI compatibility automatically.</p>
+
+    <h3 style="margin-top:0;">Creating a Function Tool</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>myTool := tool.<span class="fn">NewFunctionTool</span>(
+    <span class="str">"search_database"</span>,              <span class="cm">// tool name (no spaces)</span>
+    <span class="str">"Search the user database"</span>,      <span class="cm">// description for the LLM</span>
+    <span class="kw">func</span>(ctx context.Context, params <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}) (<span class="kw">interface</span>{}, <span class="ty">error</span>) {
+        query := params[<span class="str">"query"</span>].(<span class="ty">string</span>)
+        limit := <span class="kw">int</span>(params[<span class="str">"limit"</span>].(float64))
+
+        <span class="cm">// Access tool call ID for tracing</span>
+        <span class="kw">if</span> id, ok := ctx.<span class="fn">Value</span>(<span class="str">"tool_call_id"</span>).(<span class="ty">string</span>); ok {
+            log.<span class="fn">Printf</span>(<span class="str">"tool_call_id: %s"</span>, id)
+        }
+
+        results, err := db.<span class="fn">Search</span>(query, limit)
+        <span class="kw">if</span> err != <span class="kw">nil</span> { <span class="kw">return</span> <span class="kw">nil</span>, err }
+        <span class="kw">return</span> results, <span class="kw">nil</span>
+    },
+).<span class="fn">WithSchema</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+    <span class="str">"type"</span>: <span class="str">"object"</span>,
+    <span class="str">"properties"</span>: <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+        <span class="str">"query"</span>: <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+            <span class="str">"type"</span>: <span class="str">"string"</span>,
+            <span class="str">"description"</span>: <span class="str">"Search query string"</span>,
+        },
+        <span class="str">"limit"</span>: <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{
+            <span class="str">"type"</span>: <span class="str">"integer"</span>,
+            <span class="str">"description"</span>: <span class="str">"Max results to return"</span>,
+        },
+    },
+    <span class="str">"required"</span>: []<span class="ty">string</span>{<span class="str">"query"</span>},
+})</pre>
+    </div>
+
+    <h3>Context Values Available in Tools</h3>
+    <table class="ex-table">
+      <thead><tr><th>Key</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>tool_call_id</td><td>The current tool call's unique ID (auto-generated, per-call)</td></tr>
+        <tr><td>tool_name</td><td>Name of the currently executing tool</td></tr>
+        <tr><td>run_context</td><td>The *runner.RunContext (access your custom context + usage)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>OpenAI Tool Compatibility</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Convert any FunctionTool to OpenAI format</span>
+openAITool := tool.<span class="fn">ToOpenAITool</span>(myTool)
+
+<span class="cm">// Add OpenAI-format definitions directly to an agent</span>
+a.<span class="fn">AddToolFromDefinition</span>(openAITool)
+a.<span class="fn">AddToolsFromDefinitions</span>([]<span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}{tool1, tool2})</pre>
+    </div>
+
+    <h3>Tool Approval (Human-in-the-Loop)</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Tools can require human approval before execution</span>
+<span class="cm">// Approval state is tracked in RunContext.ToolApprovals</span>
+<span class="cm">// Use NextStepInterruption to pause for user input</span></pre>
+    </div>
+  </div>
+
+  <!-- PROVIDERS -->
+  <div id="section-providers" class="section">
+    <h2>Model Providers</h2>
+    <p class="section-lead">go-agentkit supports three first-class providers plus any OpenAI-compatible API via custom base URLs.</p>
+
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab(this, 'prov-openai')">OpenAI</button>
+      <button class="tab" onclick="switchTab(this, 'prov-anthropic')">Anthropic</button>
+      <button class="tab" onclick="switchTab(this, 'prov-lmstudio')">LM Studio</button>
+      <button class="tab" onclick="switchTab(this, 'prov-custom')">Custom URL</button>
+    </div>
+
+    <div id="prov-openai" class="tab-content active">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"</span>
+
+provider := openai.<span class="fn">NewProvider</span>(os.<span class="fn">Getenv</span>(<span class="str">"OPENAI_API_KEY"</span>))
+provider.<span class="fn">SetDefaultModel</span>(<span class="str">"gpt-4o"</span>)
+
+<span class="cm">// Available models: gpt-3.5-turbo, gpt-4, gpt-4o, gpt-4o-mini</span>
+
+<span class="cm">// Debug mode</span>
+<span class="cm">// OPENAI_DEBUG=1 go run .</span></pre>
+      </div>
+    </div>
+
+    <div id="prov-anthropic" class="tab-content">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model/providers/anthropic"</span>
+
+provider := anthropic.<span class="fn">NewProvider</span>(os.<span class="fn">Getenv</span>(<span class="str">"ANTHROPIC_API_KEY"</span>))
+provider.<span class="fn">SetDefaultModel</span>(<span class="str">"claude-3-haiku-20240307"</span>)
+
+<span class="cm">// Optional: rate limiting</span>
+provider.<span class="fn">WithRateLimit</span>(<span class="nt">40</span>, <span class="nt">80000</span>) <span class="cm">// 40 req/min, 80K tokens/min</span>
+
+<span class="cm">// Optional: retry config</span>
+provider.<span class="fn">WithRetryConfig</span>(<span class="nt">3</span>, <span class="nt">2</span>*time.Second) <span class="cm">// 3 retries, exponential backoff</span>
+
+<span class="cm">// Available: claude-3-haiku-20240307, claude-3-sonnet-20240229, claude-3-opus-20240229</span>
+<span class="cm">// ANTHROPIC_DEBUG=1 go run .</span></pre>
+      </div>
+    </div>
+
+    <div id="prov-lmstudio" class="tab-content">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model/providers/lmstudio"</span>
+
+<span class="cm">// 1. Download LM Studio from lmstudio.ai</span>
+<span class="cm">// 2. Load a model (Gemma, Llama3, Phi, etc.)</span>
+<span class="cm">// 3. Start Local Server (default: http://127.0.0.1:1234)</span>
+
+provider := lmstudio.<span class="fn">NewProvider</span>()
+provider.<span class="fn">SetBaseURL</span>(<span class="str">"http://127.0.0.1:1234/v1"</span>)
+provider.<span class="fn">SetDefaultModel</span>(<span class="str">"gemma-3-4b-it"</span>)
+
+<span class="cm">// LMSTUDIO_DEBUG=1 go run .</span></pre>
+      </div>
+    </div>
+
+    <div id="prov-custom" class="tab-content">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm">// Any OpenAI-compatible API — DeepSeek example</span>
+<span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model/providers/openai"</span>
+
+deepseek := openai.<span class="fn">NewProvider</span>(os.<span class="fn">Getenv</span>(<span class="str">"DEEPSEEK_API_KEY"</span>))
+deepseek.<span class="fn">SetBaseURL</span>(<span class="str">"https://api.deepseek.com/v1"</span>)
+deepseek.<span class="fn">SetDefaultModel</span>(<span class="str">"deepseek-chat"</span>)
+
+<span class="cm">// Works with any endpoint that implements the OpenAI chat completions API</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTI-AGENT -->
+  <div id="section-multiagent" class="section">
+    <h2>Multi-Agent Workflows</h2>
+    <p class="section-lead">Compose specialized agents that collaborate — hand off tasks, share context, and work together on complex workflows.</p>
+
+    <h3 style="margin-top:0;">Unidirectional Handoff</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Specialized agents</span>
+mathAgent := agent.<span class="fn">NewAgent</span>(<span class="str">"Math Agent"</span>, <span class="str">"You handle math calculations."</span>)
+mathAgent.<span class="fn">SetModelProvider</span>(provider)
+mathAgent.<span class="fn">WithTools</span>(calculatorTool)
+
+weatherAgent := agent.<span class="fn">NewAgent</span>(<span class="str">"Weather Agent"</span>, <span class="str">"You provide weather data."</span>)
+weatherAgent.<span class="fn">SetModelProvider</span>(provider)
+weatherAgent.<span class="fn">WithTools</span>(weatherTool)
+
+<span class="cm">// Coordinator delegates to specialists</span>
+coordinator := agent.<span class="fn">NewAgent</span>(<span class="str">"Coordinator"</span>, <span class="str">`
+    Delegate math to Math Agent, weather to Weather Agent.
+`</span>)
+coordinator.<span class="fn">SetModelProvider</span>(provider)
+coordinator.<span class="fn">WithHandoffs</span>(mathAgent, weatherAgent)
+
+result, err := r.<span class="fn">RunSync</span>(coordinator, &runner.RunOptions{
+    Input:    <span class="str">"What's 42/6 and what's the weather in Paris?"</span>,
+    MaxTurns: <span class="nt">20</span>,
+})</pre>
+    </div>
+
+    <h3>Bidirectional Flow</h3>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px;">Agents can delegate AND receive results back. The worker returns to the orchestrator after completing its task.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>orchestrator := agent.<span class="fn">NewAgent</span>(<span class="str">"Orchestrator"</span>, <span class="str">"Coordinate and analyze."</span>)
+worker := agent.<span class="fn">NewAgent</span>(<span class="str">"Worker"</span>, <span class="str">"Process and return results."</span>)
+worker.<span class="fn">WithTools</span>(processingTool)
+
+<span class="cm">// Bidirectional: worker can return to orchestrator</span>
+orchestrator.<span class="fn">WithHandoffs</span>(worker)
+worker.<span class="fn">WithHandoffs</span>(orchestrator) <span class="cm">// ← the key line</span>
+
+<span class="cm">// Key bidirectional primitives in handoff metadata:</span>
+<span class="cm">//   TaskID:       unique task tracking ID</span>
+<span class="cm">//   ReturnToAgent: which agent to return to</span>
+<span class="cm">//   IsTaskComplete: signals task is done</span></pre>
+    </div>
+
+    <h3>Input Filtering During Handoffs</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Filter conversation history during handoffs</span>
+<span class="cm">// Removes tool calls, trims old messages, passes clean context</span>
+<span class="cm">// Configured at the handoff level via InputFilter functions</span></pre>
+    </div>
+  </div>
+
+  <!-- CONTEXT SHARING -->
+  <div id="section-context" class="section">
+    <h2>Context Sharing</h2>
+    <p class="section-lead"><code>RunContext</code> lets you share typed custom data, usage statistics, and approval states across all agents in a workflow.</p>
+
+    <h3 style="margin-top:0;">Defining a Custom Context</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// 1. Define your context type</span>
+<span class="kw">type</span> <span class="ty">AppContext</span> <span class="kw">struct</span> {
+    UserID    <span class="ty">string</span>
+    OrderID   <span class="ty">string</span>
+    SessionID <span class="ty">string</span>
+    Metadata  <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}
+}
+
+<span class="cm">// 2. Create and pass it to the runner</span>
+appCtx := &AppContext{
+    UserID:   <span class="str">"user_123"</span>,
+    SessionID: fmt.<span class="fn">Sprintf</span>(<span class="str">"session_%d"</span>, time.<span class="fn">Now</span>().<span class="fn">Unix</span>()),
+    Metadata: <span class="fn">make</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}),
+}
+
+result, err := r.<span class="fn">Run</span>(ctx, agent, &runner.RunOptions{
+    Input:   <span class="str">"Process order"</span>,
+    Context: appCtx,
+})
+
+<span class="cm">// 3. Read updated context from result</span>
+<span class="kw">if</span> rc, ok := result.RunContext.(*runner.RunContext); ok {
+    <span class="kw">if</span> myCtx, ok := rc.Context.(*AppContext); ok {
+        fmt.<span class="fn">Println</span>(myCtx.UserID)
+        fmt.<span class="fn">Println</span>(rc.Usage.TotalTokens)
+    }
+}</pre>
+    </div>
+
+    <h3>Accessing Context Inside Tools</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="kw">func</span> <span class="fn">myToolFn</span>(ctx context.Context, params <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}) (<span class="kw">interface</span>{}, <span class="ty">error</span>) {
+    <span class="cm">// Get RunContext</span>
+    runCtxVal := ctx.<span class="fn">Value</span>(<span class="str">"run_context"</span>)
+    <span class="kw">if</span> runCtx, ok := runCtxVal.(*runner.RunContext); ok && runCtx != <span class="kw">nil</span> {
+        <span class="kw">if</span> appCtx, ok := runCtx.Context.(*AppContext); ok {
+            <span class="cm">// Read from context</span>
+            userID := appCtx.UserID
+
+            <span class="cm">// Modify shared context (visible to ALL agents)</span>
+            appCtx.Metadata[<span class="str">"last_tool"</span>] = <span class="str">"myToolFn"</span>
+            _ = userID
+        }
+    }
+    <span class="kw">return</span> <span class="str">"done"</span>, <span class="kw">nil</span>
+}</pre>
+    </div>
+
+    <h3>RunContext Fields</h3>
+    <table class="ex-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Context</td><td>interface{}</td><td>Your custom context (any struct)</td></tr>
+        <tr><td>Usage.InputTokens</td><td>int</td><td>Total input tokens consumed</td></tr>
+        <tr><td>Usage.OutputTokens</td><td>int</td><td>Total output tokens generated</td></tr>
+        <tr><td>Usage.TotalTokens</td><td>int</td><td>Combined token count</td></tr>
+        <tr><td>ToolApprovals</td><td>map</td><td>Approval state per tool call</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-warn">
+      <strong>Thread Safety</strong>
+      RunContext itself is thread-safe, but your custom context struct must handle concurrent access if tools run in parallel.
+    </div>
+  </div>
+
+  <!-- STREAMING -->
+  <div id="section-streaming" class="section">
+    <h2>Streaming</h2>
+    <p class="section-lead">Get real-time token-by-token output from agents using a typed event channel — no polling, no blocking.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/model"</span>
+
+streamResult, err := r.<span class="fn">RunStreaming</span>(ctx, myAgent, &runner.RunOptions{
+    Input: <span class="str">"Tell me a long story"</span>,
+})
+<span class="kw">if</span> err != <span class="kw">nil</span> { log.<span class="fn">Fatal</span>(err) }
+
+<span class="kw">for</span> event := <span class="kw">range</span> streamResult.Stream {
+    <span class="kw">switch</span> event.Type {
+    <span class="kw">case</span> model.StreamEventTypeContent:
+        fmt.<span class="fn">Print</span>(event.Content)  <span class="cm">// stream tokens as they arrive</span>
+
+    <span class="kw">case</span> model.StreamEventTypeToolCall:
+        fmt.<span class="fn">Printf</span>(<span class="str">"\n🔧 Calling: %s\n"</span>, event.ToolCall.Name)
+
+    <span class="kw">case</span> model.StreamEventTypeHandoff:
+        fmt.<span class="fn">Printf</span>(<span class="str">"\n↪ Handoff to: %s\n"</span>, event.Handoff.TargetAgent)
+
+    <span class="kw">case</span> model.StreamEventTypeDone:
+        fmt.<span class="fn">Println</span>(<span class="str">"\n✓ Complete"</span>)
+    }
+}</pre>
+    </div>
+
+    <h3>Stream Event Types</h3>
+    <table class="ex-table">
+      <thead><tr><th>Event Type</th><th>Description</th><th>Key Field</th></tr></thead>
+      <tbody>
+        <tr><td>StreamEventTypeContent</td><td>A chunk of text output from the LLM</td><td>event.Content</td></tr>
+        <tr><td>StreamEventTypeToolCall</td><td>The agent is invoking a tool</td><td>event.ToolCall</td></tr>
+        <tr><td>StreamEventTypeHandoff</td><td>The agent is handing off to another</td><td>event.Handoff</td></tr>
+        <tr><td>StreamEventTypeDone</td><td>Stream is complete</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TRACING -->
+  <div id="section-tracing" class="section">
+    <h2>Tracing</h2>
+    <p class="section-lead">Built-in tracing sends execution data to the OpenAI dashboard — matching the Python and TypeScript SDK behavior exactly.</p>
+
+    <h3 style="margin-top:0;">Enable / Disable</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span></div>
+      <pre><span class="cm"># Disable globally via environment variable</span>
+export OPENAI_AGENTS_DISABLE_TRACING=1
+<span class="cm"># or</span>
+export OPENAI_AGENTS_DISABLE_TRACING=true</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm">// Per-run: disable tracing</span>
+r.<span class="fn">RunSync</span>(agent, &runner.RunOptions{
+    Input: <span class="str">"hello"</span>,
+    RunConfig: &runner.RunConfig{
+        TracingDisabled: <span class="kw">true</span>,
+    },
+})
+
+<span class="cm">// Per-run: enable with custom workflow name</span>
+r.<span class="fn">RunSync</span>(agent, &runner.RunOptions{
+    Input: <span class="str">"hello"</span>,
+    RunConfig: &runner.RunConfig{
+        TracingDisabled: <span class="kw">false</span>,
+        TracingConfig: &runner.TracingConfig{
+            WorkflowName: <span class="str">"my_workflow"</span>,
+        },
+    },
+})</pre>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>No Local Files</strong>
+      Traces are sent to the OpenAI backend only. No <code>trace_*.log</code> files are created locally — matching Python/TypeScript SDK behavior.
+    </div>
+
+    <h3>Debug Flags</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span></div>
+      <pre><span class="cm"># General debug (runner + core)</span>
+DEBUG=1 go run .
+
+<span class="cm"># Provider-specific debug</span>
+OPENAI_DEBUG=1 go run .
+ANTHROPIC_DEBUG=1 go run .
+LMSTUDIO_DEBUG=1 go run .
+
+<span class="cm"># Combine flags</span>
+DEBUG=1 OPENAI_DEBUG=1 go run .</pre>
+    </div>
+  </div>
+
+  <!-- WORKFLOW STATE -->
+  <div id="section-workflow" class="section">
+    <h2>Workflow State Management</h2>
+    <p class="section-lead">Persist agent state between executions, retry on failure, checkpoint progress, and validate pre-handoff conditions.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/test/mocks"</span>
+
+<span class="cm">// In-memory state store (swap for DB in production)</span>
+stateStore := mocks.<span class="fn">NewInMemoryStateStore</span>()
+
+workflowConfig := &runner.WorkflowConfig{
+    <span class="cm">// Retry configuration</span>
+    RetryConfig: &runner.RetryConfig{
+        MaxRetries:         <span class="nt">2</span>,
+        RetryDelay:         time.Second,
+        RetryBackoffFactor: <span class="nt">2.0</span>,
+    },
+    <span class="cm">// State persistence</span>
+    StateManagement: &runner.StateManagementConfig{
+        PersistState:        <span class="kw">true</span>,
+        StateStore:          stateStore,
+        CheckpointFrequency: <span class="nt">5</span> * time.Second,
+    },
+    <span class="cm">// Pre-handoff validation</span>
+    ValidationConfig: &runner.ValidationConfig{
+        PreHandoffValidation: []runner.ValidationRule{{
+            Name: <span class="str">"StateNotNil"</span>,
+            Validate: <span class="kw">func</span>(data <span class="kw">interface</span>{}) (<span class="ty">bool</span>, <span class="ty">error</span>) {
+                state, ok := data.(*runner.WorkflowState)
+                <span class="kw">return</span> ok && state != <span class="kw">nil</span>, <span class="kw">nil</span>
+            },
+            ErrorMessage: <span class="str">"Workflow state must not be nil"</span>,
+            Severity:     runner.ValidationWarning,
+        }},
+    },
+}
+
+<span class="cm">// WorkflowRunner wraps the base runner</span>
+wfRunner := runner.<span class="fn">NewWorkflowRunner</span>(baseRunner, workflowConfig)
+
+state := &runner.WorkflowState{
+    CurrentPhase:    <span class="str">""</span>,
+    CompletedPhases: <span class="fn">make</span>([]<span class="ty">string</span>, <span class="nt">0</span>),
+    Artifacts:       <span class="fn">make</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}),
+    LastCheckpoint:  time.<span class="fn">Now</span>(),
+    Metadata:        <span class="fn">make</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">interface</span>{}),
+}
+
+result, err := wfRunner.<span class="fn">RunWorkflow</span>(ctx, agent, &runner.RunOptions{
+    MaxTurns:       <span class="nt">10</span>,
+    WorkflowConfig: workflowConfig,
+    Input:          state,
+})</pre>
+    </div>
+
+    <h3>WorkflowState Fields</h3>
+    <table class="ex-table">
+      <thead><tr><th>Field</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>CurrentPhase</td><td>Name of the workflow phase currently executing</td></tr>
+        <tr><td>CompletedPhases</td><td>Ordered list of phases that have finished</td></tr>
+        <tr><td>Artifacts</td><td>Key-value store for outputs produced during the workflow</td></tr>
+        <tr><td>LastCheckpoint</td><td>Timestamp of the last successful checkpoint</td></tr>
+        <tr><td>Metadata</td><td>Arbitrary metadata map for custom data</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MCP -->
+  <div id="section-mcp" class="section">
+    <h2>MCP Support</h2>
+    <p class="section-lead">Model Context Protocol lets you connect agents to external tool servers — locally via stdio or remotely via HTTP/SSE.</p>
+
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab(this, 'mcp-local')">Local (stdio)</button>
+      <button class="tab" onclick="switchTab(this, 'mcp-hosted')">Hosted (HTTP/SSE)</button>
+      <button class="tab" onclick="switchTab(this, 'mcp-handoffs')">With Handoffs</button>
+    </div>
+
+    <div id="mcp-local" class="tab-content active">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span></div>
+        <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/mcp/local"</span>
+
+<span class="cm">// Launch a local MCP server via stdio</span>
+mcpClient := local.<span class="fn">NewMCPClient</span>(<span class="str">"my-tools"</span>, []<span class="ty">string</span>{
+    <span class="str">"./my-mcp-server"</span>,
+})
+
+<span class="cm">// Get tools from the MCP server</span>
+mcpTools, err := mcpClient.<span class="fn">GetTools</span>()
+
+<span class="cm">// Add to agent (auto-converts to FunctionTool)</span>
+agent.<span class="fn">WithTools</span>(mcpTools...)</pre>
+      </div>
+    </div>
+
+    <div id="mcp-hosted" class="tab-content">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span></div>
+        <pre><span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/mcp/hosted"</span>
+
+<span class="cm">// Connect to a remote MCP server over HTTP/SSE</span>
+mcpClient := hosted.<span class="fn">NewMCPClient</span>(<span class="str">"https://mcp.example.com/sse"</span>, &hosted.Config{
+    APIKey: os.<span class="fn">Getenv</span>(<span class="str">"MCP_API_KEY"</span>),
+})
+
+mcpTools, err := mcpClient.<span class="fn">GetTools</span>()
+agent.<span class="fn">WithTools</span>(mcpTools...)</pre>
+      </div>
+    </div>
+
+    <div id="mcp-handoffs" class="tab-content">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span></div>
+        <pre><span class="cm">// MCP agents can also participate in multi-agent handoffs</span>
+mcpAgent := agent.<span class="fn">NewAgent</span>(<span class="str">"MCP Agent"</span>, <span class="str">"You use external MCP tools."</span>)
+mcpAgent.<span class="fn">WithTools</span>(mcpTools...)
+
+coordinator.<span class="fn">WithHandoffs</span>(mcpAgent)
+
+<span class="cm">// See: examples/mcp/mcp_with_handoffs</span></pre>
+      </div>
+    </div>
+
+    <h3>MCP Examples</h3>
+    <table class="ex-table">
+      <thead><tr><th>Example</th><th>Path</th></tr></thead>
+      <tbody>
+        <tr><td>Local MCP</td><td>examples/mcp/local_mcp_example</td></tr>
+        <tr><td>Hosted MCP</td><td>examples/mcp/hosted_mcp_example</td></tr>
+        <tr><td>MCP + Handoffs</td><td>examples/mcp/mcp_with_handoffs</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PACKAGES -->
+  <div id="section-packages" class="section">
+    <h2>Package Reference</h2>
+    <p class="section-lead">Full package map from <a href="https://pkg.go.dev/github.com/Muhammadhamd/go-agentkit" style="color:var(--blue);" target="_blank">pkg.go.dev</a></p>
+
+    <div class="pkg-grid">
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/agent</div>
+        <div class="pkg-desc">Core Agent type. NewAgent(), SetModelProvider(), WithTools(), WithHandoffs(), SetOutputType()</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/runner</div>
+        <div class="pkg-desc">Runner, RunOptions, RunContext, WorkflowRunner, RunConfig, RetryConfig, WorkflowState</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/tool</div>
+        <div class="pkg-desc">NewFunctionTool(), WithSchema(), ToOpenAITool(), parameter validation, error handling</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/model</div>
+        <div class="pkg-desc">Model interfaces, StreamEvent types, streaming result, usage tracking</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/model/providers/openai</div>
+        <div class="pkg-desc">OpenAI provider. NewProvider(), SetAPIKey(), SetDefaultModel(), SetBaseURL()</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/model/providers/anthropic</div>
+        <div class="pkg-desc">Anthropic Claude provider. WithRateLimit(), WithRetryConfig()</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/model/providers/lmstudio</div>
+        <div class="pkg-desc">LM Studio local models. NewProvider(), SetBaseURL(), SetDefaultModel()</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/mcp</div>
+        <div class="pkg-desc">MCP client base. Tool conversion from MCP to SDK FunctionTool format</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/mcp/local</div>
+        <div class="pkg-desc">Local MCP servers via stdio transport</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/mcp/hosted</div>
+        <div class="pkg-desc">Remote MCP servers via HTTP/SSE transport</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/result</div>
+        <div class="pkg-desc">RunResult type. FinalOutput, RunContext, GeneratedItems, RawResponses</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">pkg/tracing</div>
+        <div class="pkg-desc">Tracing internals, span management, OpenAI backend integration</div>
+      </div>
+      <div class="pkg-item">
+        <div class="pkg-path">test/mocks</div>
+        <div class="pkg-desc">InMemoryStateStore, mock providers, testing utilities</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLES -->
+  <div id="section-examples" class="section">
+    <h2>Examples</h2>
+    <p class="section-lead">10+ runnable examples in the <code>examples/</code> directory — covering every major feature.</p>
+
+    <table class="ex-table">
+      <thead><tr><th>Example</th><th>Provider</th><th>What it Demonstrates</th></tr></thead>
+      <tbody>
+        <tr><td>multi_agent_example</td><td>LM Studio</td><td>Specialized agent collaboration with local LLM. Math + Weather agents coordinated by a frontend agent.</td></tr>
+        <tr><td>openai_example</td><td>OpenAI</td><td>Single agent with function calling. Basic tool invocation with schema generation.</td></tr>
+        <tr><td>openai_multi_agent_example</td><td>OpenAI</td><td>Multi-agent with OpenAI models. Streaming support and proper tool calling.</td></tr>
+        <tr><td>anthropic_example</td><td>Anthropic</td><td>Claude with tool calling. Rate limiting and retry config.</td></tr>
+        <tr><td>anthropic_handoff_example</td><td>Anthropic</td><td>Agent handoffs with Claude models. Context preservation across handoffs.</td></tr>
+        <tr><td>bidirectional_flow_example</td><td>OpenAI</td><td>Orchestrator ↔ Worker with return handoffs. Task delegation and result passing.</td></tr>
+        <tr><td>typescript_code_review_example</td><td>OpenAI</td><td>Practical multi-agent code review. Reviewer + Fixer agents with bidirectional handoffs.</td></tr>
+        <tr><td>openai_advanced_workflow</td><td>OpenAI</td><td>Advanced workflow management with state, retry, and checkpointing.</td></tr>
+        <tr><td>mcp/local_mcp_example</td><td>Any</td><td>Local MCP server integration via stdio transport.</td></tr>
+        <tr><td>mcp/hosted_mcp_example</td><td>Any</td><td>Remote MCP server over HTTP/SSE.</td></tr>
+        <tr><td>mcp/mcp_with_handoffs</td><td>Any</td><td>MCP tools combined with agent handoffs.</td></tr>
+        <tr><td>store.go (root)</td><td>OpenAI</td><td>Complex agentic flow: multi-agent + context sharing + tools. Run: <code>go run -tags=store store.go</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Running Examples</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm"># OpenAI examples</span>
+export OPENAI_API_KEY=sk-...
+cd examples/openai_multi_agent_example && go run .
+
+<span class="cm"># Anthropic examples</span>
+export ANTHROPIC_API_KEY=sk-ant-...
+cd examples/anthropic_handoff_example && go run .
+
+<span class="cm"># Local LLM (LM Studio must be running)</span>
+cd examples/multi_agent_example && go run .
+
+<span class="cm"># Complex flow test from repo root</span>
+go run -tags=store store.go</pre>
+    </div>
+  </div>
+
+  <!-- ENV VARS -->
+  <div id="section-envvars" class="section">
+    <h2>Environment Variables</h2>
+    <p class="section-lead">All configurable environment variables recognized by go-agentkit.</p>
+
+    <div class="env-item">
+      <div class="env-key">OPENAI_API_KEY</div>
+      <div class="env-desc">Required for the OpenAI provider. Get from platform.openai.com/account/api-keys</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">ANTHROPIC_API_KEY</div>
+      <div class="env-desc">Required for the Anthropic Claude provider. Get from console.anthropic.com</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">DEEPSEEK_API_KEY</div>
+      <div class="env-desc">Used in the DeepSeek example with a custom OpenAI-compatible base URL</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">OPENAI_AGENTS_DISABLE_TRACING</div>
+      <div class="env-desc">Set to <code>1</code> or <code>true</code> to disable all tracing. Matches Python/TypeScript SDK behavior.</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">DEBUG</div>
+      <div class="env-desc">Set to <code>1</code> to enable verbose debug output from the runner and core components</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">OPENAI_DEBUG</div>
+      <div class="env-desc">Set to <code>1</code> to enable debug output specific to the OpenAI provider</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">ANTHROPIC_DEBUG</div>
+      <div class="env-desc">Set to <code>1</code> to enable debug output for the Anthropic provider</div>
+    </div>
+    <div class="env-item">
+      <div class="env-key">LMSTUDIO_DEBUG</div>
+      <div class="env-desc">Set to <code>1</code> to enable debug output for the LM Studio local provider</div>
+    </div>
+  </div>
+
+  <!-- CONTRIBUTING -->
+  <div id="section-contributing" class="section">
+    <h2>Contributing</h2>
+    <p class="section-lead">go-agentkit is open source under MIT. Contributions, bug reports, and feature requests are welcome.</p>
+
+    <h3 style="margin-top:0;">Development Setup</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="cm"># 1. Fork & clone</span>
+git clone https://github.com/YOUR-USERNAME/go-agentkit.git
+cd go-agentkit
+
+<span class="cm"># 2. Install tools</span>
+./scripts/ci_setup.sh
+
+<span class="cm"># 3. Create your branch</span>
+git checkout -b feature/my-feature</pre>
+    </div>
+
+    <h3>Development Scripts</h3>
+    <table class="ex-table">
+      <thead><tr><th>Script</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>./scripts/lint.sh</td><td>Run gofmt and golangci-lint checks</td></tr>
+        <tr><td>./scripts/security_check.sh</td><td>Run gosec security scanner</td></tr>
+        <tr><td>./scripts/check_all.sh</td><td>Run all checks including tests</td></tr>
+        <tr><td>./scripts/version.sh bump</td><td>Bump the version in version.txt</td></tr>
+        <tr><td>./scripts/ci_setup.sh</td><td>Install all required dev tools</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Running Tests</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>cd test && make test
+<span class="cm"># or</span>
+./scripts/check_all.sh</pre>
+    </div>
+
+    <h3>Coding Standards</h3>
+    <ul class="checklist">
+      <li><span class="check">✓</span>Follow idiomatic Go patterns and Go best practices</li>
+      <li><span class="check">✓</span>Use meaningful, descriptive variable and function names</li>
+      <li><span class="check">✓</span>Write clear comments and update README/docs for new features</li>
+      <li><span class="check">✓</span>Include tests for all new functionality and bug fixes</li>
+      <li><span class="check">✓</span>Keep functions focused — small, single-purpose functions</li>
+      <li><span class="check">✓</span>Pass all linting, security, and test checks before submitting PR</li>
+    </ul>
+
+    <h3>PR Process</h3>
+    <ul class="checklist">
+      <li><span class="check">1</span>Ensure all checks pass (<code>./scripts/check_all.sh</code>)</li>
+      <li><span class="check">2</span>Update documentation and examples if needed</li>
+      <li><span class="check">3</span>Write a clear PR description explaining the change</li>
+      <li><span class="check">4</span>Link related GitHub issues in the PR description</li>
+    </ul>
+
+    <div class="alert alert-info">
+      <strong>Versioning</strong>
+      go-agentkit uses semantic versioning. Versions are managed in <code>version.txt</code> and bumped via <code>./scripts/version.sh bump</code>. Releases are automated via <code>.goreleaser.yml</code>.
+    </div>
+  </div>
+
+  <!-- VERSIONS -->
+  <div id="section-versions" class="section">
+    <h2>Version History</h2>
+    <p class="section-lead">7 releases published. Latest stable: <strong style="color:var(--green)">v1 (v0.10.2)</strong> · November 2025.</p>
+
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;margin:16px 0;">
+      <div class="version-row" style="border-bottom:1px solid var(--border2);background:var(--bg3);">
+        <div class="version-tag">v0.10.2</div>
+        <div class="version-date">Nov 16, 2025</div>
+        <div class="version-notes">Latest stable release (tagged as v1). Full feature set including bidirectional flow, MCP, workflow state management, and tool call ID context.</div>
+        <span class="latest-badge">latest</span>
+      </div>
+      <div class="version-row">
+        <div class="version-tag">v0.9.x</div>
+        <div class="version-date">Nov 2025</div>
+        <div class="version-notes">Agentic loop & context sharing improvements. Tool use behavior controls. Lifecycle hooks.</div>
+      </div>
+      <div class="version-row">
+        <div class="version-tag">v0.0.9</div>
+        <div class="version-date">Nov 3, 2025</div>
+        <div class="version-notes">Initial published version on pkg.go.dev. Core agent/runner/tool architecture. OpenAI + Anthropic + LM Studio providers.</div>
+      </div>
+      <div class="version-row">
+        <div class="version-tag">v0.0.x</div>
+        <div class="version-date">Oct–Nov 2025</div>
+        <div class="version-notes">Early development releases. Core SDK foundations established.</div>
+      </div>
+    </div>
+
+    <div class="alert alert-warn">
+      <strong>Pre-v1 Stability</strong>
+      pkg.go.dev marks this as pre-stable (no v1.x.x tag yet). The v0.10.2 release is tagged "v1" on GitHub but the module path has not moved to v1. API may have minor changes between minor versions.
+    </div>
+
+    <h3>Module Path</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">go.mod</span></div>
+      <pre>require github.com/muhammadhamd/go-agentkit <span class="nt">v0.10.2</span>
+
+<span class="cm">// Import path (case-insensitive on GitHub, but use lowercase)</span>
+<span class="kw">import</span> <span class="str">"github.com/muhammadhamd/go-agentkit/pkg/agent"</span></pre>
+    </div>
+
+    <h3>Quality Signals (pkg.go.dev)</h3>
+    <ul class="checklist">
+      <li><span class="check">✓</span>Valid go.mod file with proper module declaration</li>
+      <li><span class="check">✓</span>Redistributable MIT license</li>
+      <li><span class="check">✓</span>Tagged versions (semantic versioning)</li>
+      <li><span class="check">✗</span>Not yet on stable v1.x.x (actively developing toward stability)</li>
+    </ul>
+  </div>
+
+  <!-- CLOUD -->
+  <div id="section-cloud" class="section">
+    <h2>Cloud Support</h2>
+    <p class="section-lead">A managed cloud service for go-agentkit is in development at <a href="https://go-agent.org" style="color:var(--blue);" target="_blank">go-agent.org</a>.</p>
+
+    <div class="cloud-cta">
+      <h3>☁ go-agent Cloud — Coming Soon</h3>
+      <p>Deploy, scale, and monitor your Go agents without managing infrastructure. Join the waitlist for early access.</p>
+      <div class="cloud-features">
+        <div class="cloud-feature-item">⟳ Managed Agent Deployment</div>
+        <div class="cloud-feature-item">⬡ Horizontal Scaling</div>
+        <div class="cloud-feature-item">◎ Observability & Monitoring</div>
+        <div class="cloud-feature-item">$ Cost Optimization</div>
+        <div class="cloud-feature-item">⊙ SOC2 Enterprise Security</div>
+      </div>
+      <a href="https://go-agent.org/#waitlist" class="btn btn-primary" target="_blank">Join the Waitlist →</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 style="margin-top:0;">Community & Support</h3>
+    <table class="ex-table">
+      <thead><tr><th>Channel</th><th>Link</th></tr></thead>
+      <tbody>
+        <tr><td>Website</td><td><a href="https://go-agent.org" style="color:var(--blue);" target="_blank">go-agent.org</a></td></tr>
+        <tr><td>GitHub Issues</td><td><a href="https://github.com/Muhammadhamd/go-agentkit/issues" style="color:var(--blue);" target="_blank">Report bugs & request features</a></td></tr>
+        <tr><td>GitHub Discussions</td><td><a href="https://github.com/Muhammadhamd/go-agentkit/discussions" style="color:var(--blue);" target="_blank">Community conversation</a></td></tr>
+        <tr><td>Creator (LinkedIn)</td><td><a href="https://linkedin.com/in/MuhammadHamd" style="color:var(--blue);" target="_blank">Muhammad Hamd</a></td></tr>
+        <tr><td>pkg.go.dev</td><td><a href="https://pkg.go.dev/github.com/Muhammadhamd/go-agentkit" style="color:var(--blue);" target="_blank">Package documentation</a></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Acknowledgements</h3>
+    <p style="color:var(--text2);font-size:13px;line-height:1.8;">
+      go-agentkit is inspired by <a href="https://platform.openai.com/docs/assistants/overview" style="color:var(--blue);" target="_blank">OpenAI's Assistants API</a> 
+      and <a href="https://github.com/openai/openai-agents-python" style="color:var(--blue);" target="_blank">OpenAI's Python Agent SDK</a>. 
+      The goal is to bring the same developer experience to Go — with idiomatic patterns, local LLM support, and multi-provider flexibility. 
+      Special thanks to the OpenAI team whose Python and TypeScript SDKs served as the reference implementation.
+    </p>
+  </div>
+
+</main>
+
+<script>
+  function show(id) {
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    // Show target
+    const el = document.getElementById('section-' + id);
+    if (el) el.classList.add('active');
+    // Update nav links
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    event?.currentTarget?.classList?.add('active');
+    // Find and activate the right nav link by onclick
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('onclick') === `show('${id}')`) l.classList.add('active');
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function switchTab(btn, targetId) {
+    const parent = btn.closest('.tab-row') || btn.parentNode;
+    // Deactivate all tabs in this group
+    const allTabs = parent.querySelectorAll ? parent.querySelectorAll('.tab') : [];
+    if (allTabs.length) {
+      allTabs.forEach(t => t.classList.remove('active'));
+    } else {
+      // Find sibling tabs
+      btn.parentNode.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    }
+    btn.classList.add('active');
+
+    // Find all tab-content siblings
+    const section = btn.closest('.section') || document.body;
+    section.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const target = document.getElementById(targetId);
+    if (target) target.classList.add('active');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'copied!';
+      btn.style.color = 'var(--green)';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.color = '';
+      }, 1500);
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !e.ctrlKey) {
+      // future: focus search
+    }
+  });
+</script>
+</body>
+</html>
